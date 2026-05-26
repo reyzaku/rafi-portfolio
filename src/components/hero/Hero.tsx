@@ -247,6 +247,46 @@ function getRotateMsg(id: string, rotation: number): Msg {
   return pick(entry.tilted)
 }
 
+function CtaButton() {
+  const btnRef = useRef<HTMLButtonElement>(null)
+
+  function onMouseMove(e: React.MouseEvent<HTMLButtonElement>) {
+    const btn = btnRef.current
+    if (!btn) return
+    const r = btn.getBoundingClientRect()
+    const x = ((e.clientX - r.left) / r.width)  * 100
+    const y = ((e.clientY - r.top)  / r.height) * 100
+    btn.style.setProperty('--mx', `${x}%`)
+    btn.style.setProperty('--my', `${y}%`)
+  }
+
+  function onMouseLeave() {
+    const btn = btnRef.current
+    if (!btn) return
+    btn.style.setProperty('--mx', '50%')
+    btn.style.setProperty('--my', '50%')
+  }
+
+  return (
+    <button
+      ref={btnRef}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      className="cta-btn"
+      style={{
+        '--mx': '50%', '--my': '50%',
+        color: '#000000',
+        fontSize: 'clamp(15px, 2vw, 20px)', fontWeight: 700, letterSpacing: '-0.04em',
+        padding: 'clamp(12px, 1.5vw, 16px) clamp(28px, 4vw, 50px)', borderRadius: '37px',
+        border: 'none', fontFamily: 'inherit', whiteSpace: 'nowrap',
+        cursor: 'pointer',
+      } as React.CSSProperties}
+    >
+      See My Work
+    </button>
+  )
+}
+
 function getDragMsg(id: string): Msg {
   const pool = DRAG_MESSAGES[id]
   if (!pool) return { msg: "Please don't do that.", emoji: '😐' }
@@ -646,14 +686,7 @@ export default function Hero() {
           position: 'absolute', left: '50%', top: 'calc(50% + 110px)',
           transform: 'translateX(-50%)',
         }}>
-          <button style={{
-            backgroundColor: '#5CFF85', color: '#000000',
-            fontSize: 'clamp(15px, 2vw, 20px)', fontWeight: 700, letterSpacing: '-0.04em',
-            padding: 'clamp(12px, 1.5vw, 16px) clamp(28px, 4vw, 50px)', borderRadius: '37px',
-            border: 'none', fontFamily: 'inherit', whiteSpace: 'nowrap',
-          }}>
-            See My Work
-          </button>
+          <CtaButton />
         </div>
 
         {/* Hint — desktop only, draggable */}
@@ -733,6 +766,14 @@ export default function Hero() {
         .draggable.correcting { pointer-events: none; }
         @keyframes hpulse { 0%,100%{opacity:0.55} 50%{opacity:1} }
         @media (max-width: 767px) { .draggable { display: none !important; } #el-cta { display: none !important; } }
+
+        .cta-btn {
+          background: radial-gradient(circle at var(--mx) var(--my), #a8ffbe 0%, #5CFF85 45%, #2ecc5e 100%);
+          transition: background 0.05s, box-shadow 0.2s;
+        }
+        .cta-btn:hover {
+          box-shadow: 0 0 32px rgba(92,255,133,0.45);
+        }
       `}</style>
     </>
   )
