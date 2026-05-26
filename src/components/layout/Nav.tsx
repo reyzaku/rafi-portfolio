@@ -129,22 +129,33 @@ function Tooltip({ label, fromTop = true }: { label: string; fromTop?: boolean }
 
 // ── ContactButton ─────────────────────────────────────────────────────
 
-function ContactButton() {
+function ContactButton({ compact = false }: { compact?: boolean }) {
+  // Desktop: 66px tall, 48px circle, 9px margin
+  // Mobile (compact): 48px tall, 34px circle, 7px margin
+  const h       = compact ? 'h-[48px]'  : 'h-[66px]'
+  const w       = compact ? 'w-[130px]' : 'w-[159px]'
+  const circle  = compact ? 'size-[34px]' : 'size-[48px]'
+  const cMargin = compact ? 'left-[7px] top-[7px]' : 'left-[9px] top-[9px]'
+  const hoverX  = compact ? 82  : 93
+  const txtLeft = compact ? 'left-[50px]' : 'left-[70px]'
+  const txtTop  = compact ? 'top-[16px]'  : 'top-[25px]'
+  const txtSize = compact ? 'text-[14px]' : 'text-[16px]'
+  const txtHoverX = compact ? -26 : -34
+
   return (
     <motion.a
       href="#contact"
-      // Exact Figma: w-159px h-48px rounded-100px bg-white/15 backdrop-blur-7.5px
-      className="relative flex w-[159px] h-[66px] rounded-[100px] bg-[rgba(255,255,255,0.15)] backdrop-blur-[7.5px] overflow-hidden cursor-pointer"
+      className={`relative flex ${w} ${h} rounded-[100px] bg-[rgba(255,255,255,0.15)] backdrop-blur-[7.5px] overflow-hidden cursor-pointer`}
       initial="rest"
       whileHover="hover"
       animate="rest"
     >
-      {/* Green arrow circle — 48px circle with 9px margin inside 66px container */}
+      {/* Green arrow circle */}
       <motion.div
-        className="absolute left-[9px] top-[9px] size-[48px]"
+        className={`absolute ${cMargin} ${circle}`}
         variants={{
           rest:  { x: 0 },
-          hover: { x: 93 },
+          hover: { x: hoverX },
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
@@ -152,12 +163,12 @@ function ContactButton() {
         <img src="/nav-arrow.svg" alt="" className="size-full" />
       </motion.div>
 
-      {/* "Let's Talk" text — vertically centered, slides left on hover */}
+      {/* "Let's Talk" text */}
       <motion.span
-        className="absolute left-[70px] top-[25px] text-white text-[16px] font-normal leading-none tracking-[-0.04em] whitespace-nowrap"
+        className={`absolute ${txtLeft} ${txtTop} text-white ${txtSize} font-normal leading-none tracking-[-0.04em] whitespace-nowrap`}
         variants={{
           rest:  { x: 0 },
-          hover: { x: -34 },
+          hover: { x: txtHoverX },
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
@@ -209,12 +220,12 @@ export default function Nav() {
 
       {/* ══ MOBILE ════════════════════════════════════════════════════ */}
       <div className="md:hidden">
-        {/* Top bar: logo left, contact right — exact Figma: px-25px pt-47px */}
-        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-[25px] pt-[67px]">
-          <div className="relative size-[47px]">
+        {/* Top bar: logo left, contact right */}
+        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-[20px] pt-[16px]">
+          <div className="relative size-[40px]">
             <Image src="/logo-green.png" alt="Rafi" fill className="object-contain" priority />
           </div>
-          <ContactButton />
+          <ContactButton compact />
         </div>
 
         {/* Bottom: tooltip above pill, pill at bottom-24px */}
