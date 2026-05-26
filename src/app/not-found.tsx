@@ -20,7 +20,7 @@ export default function NotFound() {
     const PAD = 120
 
     // Higher stiffness + lower damping = reaches target before accumulating too much velocity → minimal bounce
-    const K = 0.018
+    const K = 0.05
     const D = 0.75
 
     let posX = window.innerWidth  / 2
