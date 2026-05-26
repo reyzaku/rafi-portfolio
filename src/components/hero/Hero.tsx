@@ -60,6 +60,10 @@ export default function Hero() {
   const cursorPos    = useRef({ x: -300, y: -300 })
 
   useEffect(() => {
+    // Drag interaction is desktop-only — touch devices keep CSS percentage positions
+    const isTouch = window.matchMedia('(pointer: coarse)').matches
+    if (isTouch) return
+
     const hero = heroRef.current!
     const draggables = Array.from(hero.querySelectorAll<HTMLElement>('.draggable'))
 
@@ -359,7 +363,8 @@ export default function Hero() {
           transform: 'translateX(-50%)',
         }}>
           <p style={{
-            fontSize: '13px', fontWeight: 700, letterSpacing: '9.28px',
+            fontSize: 'clamp(10px, 2.5vw, 13px)', fontWeight: 700,
+            letterSpacing: 'clamp(4px, 2vw, 9.28px)',
             color: '#ffffff', textAlign: 'center', whiteSpace: 'nowrap',
           }}>PORTFOLIO</p>
         </div>
@@ -369,7 +374,7 @@ export default function Hero() {
           transform: 'translateX(-50%)',
         }}>
           <h1 style={{
-            fontSize: 'clamp(64px, 9vw, 126px)', fontWeight: 700,
+            fontSize: 'clamp(36px, 10vw, 126px)', fontWeight: 700,
             letterSpacing: '-0.04em', color: '#ffffff',
             lineHeight: 1, textAlign: 'center', whiteSpace: 'nowrap',
           }}>LOREM IPSUM</h1>
@@ -380,9 +385,9 @@ export default function Hero() {
           transform: 'translateX(-50%)',
         }}>
           <p style={{
-            fontSize: '16px', fontWeight: 400, color: '#a8c4ae',
+            fontSize: 'clamp(13px, 1.8vw, 16px)', fontWeight: 400, color: '#a8c4ae',
             letterSpacing: '-0.04em', lineHeight: 1.25,
-            maxWidth: '550px', textAlign: 'center',
+            maxWidth: 'min(550px, 85vw)', textAlign: 'center',
           }}>
             Lorem ipsum dolor sit amet consectetur. Eget id nulla nisi sollicitudin vel. Vulputate augue nunc lobortis a quam dui.
           </p>
@@ -394,8 +399,8 @@ export default function Hero() {
         }}>
           <button style={{
             backgroundColor: '#5CFF85', color: '#000000',
-            fontSize: '20px', fontWeight: 700, letterSpacing: '-0.04em',
-            padding: '16px 50px', borderRadius: '37px',
+            fontSize: 'clamp(15px, 2vw, 20px)', fontWeight: 700, letterSpacing: '-0.04em',
+            padding: 'clamp(12px, 1.5vw, 16px) clamp(28px, 4vw, 50px)', borderRadius: '37px',
             border: 'none', fontFamily: 'inherit', whiteSpace: 'nowrap',
           }}>
             See My Work

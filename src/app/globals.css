@@ -25,8 +25,8 @@ body {
   cursor: none;
 }
 
-* {
-  cursor: none !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
 }

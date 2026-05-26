@@ -17,5 +17,5 @@ const listeners = new Set<CorrectionListener>()
 
 export const correctionBus = {
   request: (id: string, reason: CorrectionReason) => listeners.forEach(l => l(id, reason)),
-  onRequest: (l: CorrectionListener) => { listeners.add(l); return () => listeners.delete(l) },
+  onRequest: (l: CorrectionListener) => { listeners.add(l); return () => { listeners.delete(l) } },
 }

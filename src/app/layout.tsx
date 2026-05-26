@@ -25,10 +25,13 @@ export default function RootLayout({
     <html lang="en" className={`${bricolage.variable} h-full`}>
       <body className="h-full overflow-hidden antialiased font-sans">
         {children}
-        <Ruler />
-        <SelectionOverlay />
-        <CustomCursor />
-        <SelectionBox />
+        {/* Desktop-only Figma-style tools */}
+        <div className="hidden md:block">
+          <Ruler />
+          <SelectionOverlay />
+          <CustomCursor />
+          <SelectionBox />
+        </div>
         <Analytics />
       </body>
     </html>

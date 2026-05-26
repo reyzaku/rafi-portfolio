@@ -11,5 +11,5 @@ let current: SelectionBounds = null
 export const selectionStore = {
   get: () => current,
   set: (b: SelectionBounds) => { current = b; listeners.forEach(l => l(b)) },
-  subscribe: (l: Listener) => { listeners.add(l); return () => listeners.delete(l) },
+  subscribe: (l: Listener) => { listeners.add(l); return () => { listeners.delete(l) } },
 }
