@@ -34,6 +34,11 @@ export default function WelcomeScreen() {
   const [gone,    setGone]    = useState(false)
   const [clicked, setClicked] = useState(false)
 
+  // Skip if already seen this session
+  useEffect(() => {
+    if (sessionStorage.getItem('welcome-seen')) setGone(true)
+  }, [])
+
   // Fix #2: clear the forwards-fill transform before switching to pulse animation
   useEffect(() => {
     const t = setTimeout(() => {
@@ -75,6 +80,7 @@ export default function WelcomeScreen() {
           screen.style.transform = `translateY(${-dist * p}px)`
           cursor.style.top       = (grabY - dist * p) + 'px'
         }, () => {
+          sessionStorage.setItem('welcome-seen', '1')
           setGone(true)
         })
       }, 180)
