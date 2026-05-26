@@ -591,6 +591,10 @@ export default function Hero() {
               transformStore.set(el.id, { scale: sv, rotation: rv })
               const r2 = el.getBoundingClientRect()
               selectionStore.set({ x: r2.left, y: r2.top, w: r2.width, h: r2.height, id: el.id })
+              // Cursor follows the actual top-left corner as element restores
+              cursorPos.current = { x: r2.left - 14, y: r2.top - 10 }
+              cur.style.left = (r2.left - 14) + 'px'
+              cur.style.top  = (r2.top  - 10) + 'px'
               requestAnimationFrame(tweenTransform)
             }
             tweenTransform()
