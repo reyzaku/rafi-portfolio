@@ -105,6 +105,22 @@ export default function NotFound() {
       posX += velX
       posY += velY
 
+      // Hard repulsion — physically push Rafi out if he gets too close
+      if (mouseX > -900) {
+        const rdx  = posX - mouseX
+        const rdy  = posY - mouseY
+        const rdist = Math.sqrt(rdx * rdx + rdy * rdy) || 1
+        const MIN  = 48
+        if (rdist < MIN) {
+          const push = (MIN - rdist) / rdist
+          posX += rdx * push
+          posY += rdy * push
+          // Kill velocity toward mouse so spring doesn't fight the push
+          velX += rdx * push * 0.3
+          velY += rdy * push * 0.3
+        }
+      }
+
       cur.style.left = posX + 'px'
       cur.style.top  = posY + 'px'
 
