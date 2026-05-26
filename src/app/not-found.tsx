@@ -22,7 +22,7 @@ export default function NotFound() {
     const FLEE_DIST = 180
 
     // Spring constants — (stiffness, damping)
-    const WANDER_K = 0.007,  WANDER_D = 0.90
+    const WANDER_K = 0.003,  WANDER_D = 0.95
     const FLEE_K   = 0.032,  FLEE_D   = 0.78
 
     let posX = window.innerWidth  / 2
@@ -107,8 +107,8 @@ export default function NotFound() {
       cur.style.top  = posY + 'px'
 
       // Arrived at wander target → idle (check both position and velocity settled)
-      if (state === 'wander' && Math.abs(velX) < 0.4 && Math.abs(velY) < 0.4
-          && Math.abs(targetX - posX) < 6 && Math.abs(targetY - posY) < 6) {
+      if (state === 'wander' && Math.abs(velX) < 0.15 && Math.abs(velY) < 0.15
+          && Math.abs(targetX - posX) < 10 && Math.abs(targetY - posY) < 10) {
         startIdle()
       }
 
