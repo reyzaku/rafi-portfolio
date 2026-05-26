@@ -248,23 +248,44 @@ function getRotateMsg(id: string, rotation: number): Msg {
 }
 
 function CtaButton() {
-  const btnRef = useRef<HTMLButtonElement>(null)
+  const btnRef   = useRef<HTMLButtonElement>(null)
+  const target   = useRef({ x: 50, y: 50 })
+  const current  = useRef({ x: 50, y: 50 })
+  const rafRef   = useRef<number>(0)
+  const hovering = useRef(false)
+
+  useEffect(() => {
+    const EASE = 0.072  // lower = lazier/smoother
+
+    function tick() {
+      const btn = btnRef.current
+      if (!btn) return
+
+      current.current.x += (target.current.x - current.current.x) * EASE
+      current.current.y += (target.current.y - current.current.y) * EASE
+
+      btn.style.setProperty('--mx', `${current.current.x.toFixed(2)}%`)
+      btn.style.setProperty('--my', `${current.current.y.toFixed(2)}%`)
+
+      rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [])
 
   function onMouseMove(e: React.MouseEvent<HTMLButtonElement>) {
     const btn = btnRef.current
     if (!btn) return
+    hovering.current = true
     const r = btn.getBoundingClientRect()
-    const x = ((e.clientX - r.left) / r.width)  * 100
-    const y = ((e.clientY - r.top)  / r.height) * 100
-    btn.style.setProperty('--mx', `${x}%`)
-    btn.style.setProperty('--my', `${y}%`)
+    target.current.x = ((e.clientX - r.left) / r.width)  * 100
+    target.current.y = ((e.clientY - r.top)  / r.height) * 100
   }
 
   function onMouseLeave() {
-    const btn = btnRef.current
-    if (!btn) return
-    btn.style.setProperty('--mx', '50%')
-    btn.style.setProperty('--my', '50%')
+    hovering.current = false
+    target.current = { x: 50, y: 50 }
   }
 
   return (
