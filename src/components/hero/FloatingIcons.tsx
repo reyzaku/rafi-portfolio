@@ -218,22 +218,16 @@ export default function FloatingIcons() {
           style={{
             position: 'absolute',
             width: 56, height: 56,
-            borderRadius: 14,
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.09)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'grab',
             userSelect: 'none',
             pointerEvents: 'auto',
             animation: `float-${id} ${dur}s ease-in-out infinite ${delay}s`,
             animationPlayState: 'running',
             willChange: 'transform',
-            transition: 'box-shadow 0.2s, border-color 0.2s',
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={label} width={26} height={26} draggable={false} />
+          <img src={src} alt={label} width={56} height={56} draggable={false} style={{ display: 'block' }} />
 
           {/* Tooltip label */}
           <span style={{
@@ -268,13 +262,11 @@ export default function FloatingIcons() {
 
         .fi-grabbed {
           cursor: grabbing !important;
-          box-shadow: 0 16px 40px rgba(0,0,0,0.45) !important;
-          border-color: rgba(255,255,255,0.18) !important;
+          filter: drop-shadow(0 12px 24px rgba(0,0,0,0.5));
         }
 
         .fi-selected {
-          border-color: rgba(92,255,133,0.5) !important;
-          box-shadow: 0 0 0 1px rgba(92,255,133,0.25), 0 8px 24px rgba(0,0,0,0.3) !important;
+          filter: drop-shadow(0 0 8px rgba(92,255,133,0.5));
         }
 
         ${ICONS.map(({ id, kf }) => `
