@@ -1,5 +1,6 @@
 import Nav from '@/components/layout/Nav'
 import Hero from '@/components/hero/Hero'
+import WelcomeScreen from '@/components/WelcomeScreen'
 
 export default function Home() {
   return (
@@ -18,6 +19,9 @@ export default function Home() {
           backgroundSize: '40px 40px',
         }}
       />
+
+      {/* Welcome screen */}
+      <WelcomeScreen />
 
       {/* Nav */}
       <Nav />
