@@ -7,7 +7,7 @@ export default function Home() {
       {/* Background image */}
       <div
         className="absolute inset-0 z-0 bg-cover bg-top"
-        style={{ backgroundImage: "url('/bg.png')" }}
+        style={{ backgroundImage: "url('/bg.webp')" }}
       />
 
       {/* Grid overlay */}
