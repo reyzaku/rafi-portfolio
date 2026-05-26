@@ -407,14 +407,42 @@ export default function Hero() {
           </button>
         </div>
 
-        {/* Hint */}
-        <div style={{
+        {/* Hint — desktop only */}
+        <div className="hidden md:block" style={{
           position: 'absolute', bottom: '3%', left: '50%', transform: 'translateX(-50%)',
           fontSize: '0.66rem', letterSpacing: '0.18em', textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.55)', zIndex: 10, pointerEvents: 'none',
           whiteSpace: 'nowrap', animation: 'hpulse 3s ease-in-out infinite',
         }}>
           drag anything &nbsp;·&nbsp; i dare you
+        </div>
+
+        {/* Mobile static layout */}
+        <div className="md:hidden absolute inset-0 flex flex-col items-center justify-center px-6 gap-4">
+          <p style={{
+            fontSize: '11px', fontWeight: 700,
+            letterSpacing: '7px', color: '#ffffff', textAlign: 'center', whiteSpace: 'nowrap',
+          }}>PORTFOLIO</p>
+          <h1 style={{
+            fontSize: 'clamp(36px, 12vw, 52px)', fontWeight: 700,
+            letterSpacing: '-0.04em', color: '#ffffff',
+            lineHeight: 1, textAlign: 'center', whiteSpace: 'nowrap',
+          }}>LOREM IPSUM</h1>
+          <p style={{
+            fontSize: '14px', fontWeight: 400, color: '#a8c4ae',
+            letterSpacing: '-0.02em', lineHeight: 1.45,
+            maxWidth: '320px', textAlign: 'center',
+          }}>
+            Lorem ipsum dolor sit amet consectetur. Eget id nulla nisi sollicitudin vel. Vulputate augue nunc lobortis a quam dui.
+          </p>
+          <button style={{
+            backgroundColor: '#5CFF85', color: '#000000',
+            fontSize: '17px', fontWeight: 700, letterSpacing: '-0.04em',
+            padding: '14px 40px', borderRadius: '37px',
+            border: 'none', fontFamily: 'inherit', whiteSpace: 'nowrap',
+          }}>
+            See My Work
+          </button>
         </div>
       </section>
 
@@ -453,6 +481,7 @@ export default function Hero() {
         .draggable.is-grabbed { cursor: grabbing; z-index: 50; filter: drop-shadow(0 14px 30px rgba(0,0,0,0.5)); }
         .draggable.correcting { pointer-events: none; }
         @keyframes hpulse { 0%,100%{opacity:0.55} 50%{opacity:1} }
+        @media (max-width: 767px) { .draggable { display: none !important; } #el-cta { display: none !important; } }
       `}</style>
     </>
   )
