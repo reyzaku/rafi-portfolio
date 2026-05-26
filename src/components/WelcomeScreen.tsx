@@ -41,7 +41,7 @@ export default function WelcomeScreen() {
         pulseRef.current.style.animation = 'ws-pulse 2s ease-in-out infinite'
         pulseRef.current.style.opacity   = '1'
       }
-    }, 1150 + 220 + 50) // fade-in delay + duration + buffer
+    }, 1800 + 500 + 50) // fade-in delay + duration + buffer
     return () => clearTimeout(t)
   }, [])
 
@@ -144,23 +144,23 @@ export default function WelcomeScreen() {
       <style>{`
         .ws-logo {
           opacity: 0;
-          transform: translateY(6px);
-          animation: ws-in 0.22s ease-out 0.2s forwards;
+          transform: translateY(8px);
+          animation: ws-in 0.5s ease-out 0.3s forwards;
         }
         .ws-hello {
           opacity: 0;
-          transform: translateY(6px);
-          animation: ws-in 0.22s ease-out 0.5s forwards;
+          transform: translateY(8px);
+          animation: ws-in 0.5s ease-out 0.8s forwards;
         }
         .ws-title {
           opacity: 0;
-          transform: translateY(6px);
-          animation: ws-in 0.22s ease-out 0.78s forwards;
+          transform: translateY(8px);
+          animation: ws-in 0.5s ease-out 1.2s forwards;
         }
         .ws-pulse {
           opacity: 0;
-          transform: translateY(6px);
-          animation: ws-in 0.22s ease-out 1.15s forwards;
+          transform: translateY(8px);
+          animation: ws-in 0.5s ease-out 1.8s forwards;
         }
         @keyframes ws-in {
           to { opacity: 1; transform: translateY(0); }
