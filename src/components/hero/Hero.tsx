@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { selectionStore } from '@/lib/selection-store'
 import { transformStore, correctionBus, CorrectionReason } from '@/lib/transform-store'
+import FloatingIcons from './FloatingIcons'
 
 const DRAG_MESSAGES: Record<string, { msg: string; emoji: string }> = {
   'el-eyebrow':  { msg: "That's literally the page title bro.",      emoji: '😐' },
@@ -371,6 +372,8 @@ export default function Hero() {
   return (
     <>
       <section ref={heroRef} className="relative h-screen w-full z-10 overflow-hidden select-none">
+
+        <FloatingIcons />
 
         <div id="el-eyebrow" className="draggable" style={{
           position: 'absolute', left: '50%', top: 'calc(50% - 148px)',
