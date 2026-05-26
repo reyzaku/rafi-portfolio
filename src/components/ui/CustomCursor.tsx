@@ -69,7 +69,7 @@ export default function CustomCursor() {
         <span
           className="text-black font-medium text-[13px] leading-none tracking-[-0.04em] font-sans"
         >
-          awesome guest @guest
+          awesome-guest @guest
         </span>
       </div>
     </div>
