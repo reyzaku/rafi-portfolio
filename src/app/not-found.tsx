@@ -18,13 +18,16 @@ export default function NotFound() {
     const cur = cursorRef.current!
     const lbl = labelRef.current!
 
-    const PAD         = 100
-    const FLEE_DIST   = 180
-    const WANDER_EASE = 0.035
-    const FLEE_EASE   = 0.12
+    const PAD       = 100
+    const FLEE_DIST = 180
+
+    // Spring constants — (stiffness, damping)
+    const WANDER_K = 0.007,  WANDER_D = 0.90
+    const FLEE_K   = 0.032,  FLEE_D   = 0.78
 
     let posX = window.innerWidth  / 2
     let posY = window.innerHeight / 2
+    let velX = 0, velY = 0
     let targetX = posX, targetY = posY
     let mouseX = -999, mouseY = -999
     let state: 'wander' | 'idle' | 'flee' = 'wander'
@@ -93,15 +96,19 @@ export default function NotFound() {
         startWander()
       }
 
-      const ease = state === 'flee' ? FLEE_EASE : WANDER_EASE
-      posX += (targetX - posX) * ease
-      posY += (targetY - posY) * ease
+      const k = state === 'flee' ? FLEE_K : WANDER_K
+      const d = state === 'flee' ? FLEE_D : WANDER_D
+      velX = (velX + (targetX - posX) * k) * d
+      velY = (velY + (targetY - posY) * k) * d
+      posX += velX
+      posY += velY
 
       cur.style.left = posX + 'px'
       cur.style.top  = posY + 'px'
 
-      // Arrived at wander target → idle
-      if (state === 'wander' && Math.abs(targetX - posX) < 4 && Math.abs(targetY - posY) < 4) {
+      // Arrived at wander target → idle (check both position and velocity settled)
+      if (state === 'wander' && Math.abs(velX) < 0.4 && Math.abs(velY) < 0.4
+          && Math.abs(targetX - posX) < 6 && Math.abs(targetY - posY) < 6) {
         startIdle()
       }
 
