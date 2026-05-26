@@ -221,7 +221,7 @@ export default function Nav() {
       {/* ══ MOBILE ════════════════════════════════════════════════════ */}
       <div className="md:hidden">
         {/* Top bar: logo left, contact right */}
-        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-[20px] pt-[16px]">
+        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between" style={{ padding: '52px 24px 0' }}>
           <div className="relative size-[40px]">
             <Image src="/logo-green.png" alt="Rafi" fill className="object-contain" priority />
           </div>
