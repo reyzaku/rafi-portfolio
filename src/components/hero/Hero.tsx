@@ -705,7 +705,7 @@ export default function Hero() {
             fontSize: 'clamp(36px, 10vw, 126px)', fontWeight: 700,
             letterSpacing: '-0.04em', color: '#ffffff',
             lineHeight: 1, textAlign: 'center', whiteSpace: 'nowrap',
-          }}>LOREM IPSUM</h1>
+          }}>RAFI ABDILLAH</h1>
         </div>
 
         <div id="el-subtext" className="draggable" style={{
@@ -717,7 +717,7 @@ export default function Hero() {
             letterSpacing: '-0.04em', lineHeight: 1.25,
             maxWidth: 'min(550px, 85vw)', textAlign: 'center',
           }}>
-            Lorem ipsum dolor sit amet consectetur. Eget id nulla nisi sollicitudin vel. Vulputate augue nunc lobortis a quam dui.
+            Graphic & Motion Designer from Jakarta. Figma Enthusiast, and your go-to design problem solver.
           </p>
         </div>
 
@@ -750,13 +750,13 @@ export default function Hero() {
             fontSize: 'clamp(36px, 12vw, 52px)', fontWeight: 700,
             letterSpacing: '-0.04em', color: '#ffffff',
             lineHeight: 1, textAlign: 'center', whiteSpace: 'nowrap',
-          }}>LOREM IPSUM</h1>
+          }}>RAFI ABDILLAH</h1>
           <p style={{
             fontSize: '14px', fontWeight: 400, color: '#a8c4ae',
             letterSpacing: '-0.02em', lineHeight: 1.45,
             maxWidth: '320px', textAlign: 'center',
           }}>
-            Lorem ipsum dolor sit amet consectetur. Eget id nulla nisi sollicitudin vel. Vulputate augue nunc lobortis a quam dui.
+            Graphic & Motion Designer from Jakarta. Figma Enthusiast, and your go-to design problem solver.
           </p>
           <button style={{
             backgroundColor: '#5CFF85', color: '#000000',
