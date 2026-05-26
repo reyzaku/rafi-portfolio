@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { selectionStore } from '@/lib/selection-store'
 
 /* ─── icon definitions ───────────────────────────────────────────────────── */
 // lx/ly = desktop positions (% of hero)
@@ -89,6 +90,8 @@ export default function FloatingIcons() {
       target.style.animationPlayState = 'paused'
       target.style.zIndex = '60'
       target.classList.add('fi-grabbed')
+      const r = target.getBoundingClientRect()
+      selectionStore.set({ x: r.left, y: r.top, w: r.width, h: r.height, id: target.id })
     }
 
     function onMove(e: MouseEvent | TouchEvent) {
@@ -98,6 +101,8 @@ export default function FloatingIcons() {
       const dy = pt.clientY - active.startMY
       active.el.style.left = (active.startElX + dx) + 'px'
       active.el.style.top  = (active.startElY + dy) + 'px'
+      const r = active.el.getBoundingClientRect()
+      selectionStore.set({ x: r.left, y: r.top, w: r.width, h: r.height, id: active.el.id })
     }
 
     function onUp() {
@@ -105,6 +110,7 @@ export default function FloatingIcons() {
       active.el.style.animationPlayState = 'running'
       active.el.style.zIndex = ''
       active.el.classList.remove('fi-grabbed')
+      selectionStore.set(null)
       active = null
     }
 
