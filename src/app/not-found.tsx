@@ -68,13 +68,12 @@ export default function NotFound() {
       if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0 }
       state = 'flee'
       lbl.textContent = pick(FLEE_LABELS)
-      // Set flee target far away from mouse
-      const dx  = posX - mx
-      const dy  = posY - my
-      const len = Math.sqrt(dx * dx + dy * dy) || 1
-      const b   = bounds()
-      targetX = clamp(posX + (dx / len) * 350, b.minX, b.maxX)
-      targetY = clamp(posY + (dy / len) * 350, b.minY, b.maxY)
+      const fdx = posX - mx
+      const fdy = posY - my
+      const len = Math.sqrt(fdx * fdx + fdy * fdy) || 1
+      // No bounds clamp on flee target — lets Rafi escape even when cornered
+      targetX = posX + (fdx / len) * 350
+      targetY = posY + (fdy / len) * 350
     }
 
     cur.style.opacity = '1'
@@ -87,11 +86,10 @@ export default function NotFound() {
 
       if (dist < FLEE_DIST && mouseX > -900) {
         if (state !== 'flee') startFlee(mouseX, mouseY)
-        // Smoothly steer flee target — lerp instead of snap to avoid spasm when cornered
-        const b      = bounds()
-        const len    = Math.sqrt(dx * dx + dy * dy) || 1
-        const rawX   = clamp(posX + (-dx / len) * 300, b.minX, b.maxX)
-        const rawY   = clamp(posY + (-dy / len) * 300, b.minY, b.maxY)
+        // Steer flee target each frame — no clamp so Rafi can escape past cursor when cornered
+        const len  = Math.sqrt(dx * dx + dy * dy) || 1
+        const rawX = posX + (-dx / len) * 300
+        const rawY = posY + (-dy / len) * 300
         targetX += (rawX - targetX) * 0.12
         targetY += (rawY - targetY) * 0.12
       } else if (state === 'flee') {
@@ -104,6 +102,11 @@ export default function NotFound() {
       velY = (velY + (targetY - posY) * k) * d
       posX += velX
       posY += velY
+
+      // Clamp rendered position — target is unclamped so spring force never goes to zero
+      const b = bounds()
+      posX = clamp(posX, b.minX, b.maxX)
+      posY = clamp(posY, b.minY, b.maxY)
 
       cur.style.left = posX + 'px'
       cur.style.top  = posY + 'px'
