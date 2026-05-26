@@ -32,6 +32,7 @@ export default function NotFound() {
     let mouseX = -999, mouseY = -999
     let state: 'wander' | 'idle' | 'flee' = 'wander'
     let idleTimer = 0
+    let fleeEndTimer = 0
     let rafId = 0
 
     function bounds() {
@@ -66,6 +67,7 @@ export default function NotFound() {
 
     function startFlee(mx: number, my: number) {
       if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0 }
+      if (fleeEndTimer) { clearTimeout(fleeEndTimer); fleeEndTimer = 0 }
       state = 'flee'
       lbl.textContent = pick(FLEE_LABELS)
       const fdx = posX - mx
@@ -92,8 +94,11 @@ export default function NotFound() {
         const rawY = posY + (-dy / len) * 300
         targetX += (rawX - targetX) * 0.12
         targetY += (rawY - targetY) * 0.12
-      } else if (state === 'flee') {
-        startWander()
+      } else if (state === 'flee' && !fleeEndTimer) {
+        fleeEndTimer = window.setTimeout(() => {
+          fleeEndTimer = 0
+          startWander()
+        }, 900)
       }
 
       const k = state === 'flee' ? FLEE_K : WANDER_K
@@ -129,6 +134,7 @@ export default function NotFound() {
     return () => {
       cancelAnimationFrame(rafId)
       clearTimeout(idleTimer)
+      clearTimeout(fleeEndTimer)
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseleave', onLeave)
     }
