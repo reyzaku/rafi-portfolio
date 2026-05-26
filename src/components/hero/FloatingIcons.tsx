@@ -1,81 +1,56 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { SiFigma, SiHtml5 } from 'react-icons/si'
 
 /* ─── icon definitions ───────────────────────────────────────────────────── */
 // lx/ly = desktop positions (% of hero)
 // mx/my = mobile positions (% of hero)
-// Adobe icons use an inline badge (colored bg + abbreviation letters)
 // kf: [dx1, dy1, rot1, dx2, dy2, rot2] for the float keyframe
-const ICONS: {
-  id: string
-  label: string
-  lx: string; ly: string
-  mx: string; my: string
-  dur: number; delay: number
-  kf: number[]
-  render: () => React.ReactNode
-}[] = [
+const ICONS = [
   {
     id: 'fi-ai',
     label: 'Illustrator',
+    src: '/icon-ai.svg',
     lx: '8%',   ly: '36%',
     mx: '12%',  my: '7%',
     dur: 6.2,   delay: 0,
     kf: [8, -10, 4, -6, 9, -3],
-    render: () => (
-      <span style={{
-        fontFamily: 'inherit', fontWeight: 800, fontSize: 13,
-        letterSpacing: '-0.03em', color: '#FF9A00',
-      }}>Ai</span>
-    ),
   },
   {
     id: 'fi-ps',
     label: 'Photoshop',
+    src: '/icon-ps.svg',
     lx: '10%',  ly: '60%',
     mx: '47%',  my: '5%',
     dur: 5.8,   delay: 1.1,
     kf: [-9, -8, -3, 7, 10, 4],
-    render: () => (
-      <span style={{
-        fontFamily: 'inherit', fontWeight: 800, fontSize: 13,
-        letterSpacing: '-0.03em', color: '#31A8FF',
-      }}>Ps</span>
-    ),
   },
   {
     id: 'fi-ae',
     label: 'After Effects',
+    src: '/icon-ae.svg',
     lx: '84%',  ly: '32%',
     mx: '80%',  my: '7%',
     dur: 7.1,   delay: 0.5,
     kf: [6, -12, -4, -8, 7, 3],
-    render: () => (
-      <span style={{
-        fontFamily: 'inherit', fontWeight: 800, fontSize: 13,
-        letterSpacing: '-0.03em', color: '#9999FF',
-      }}>Ae</span>
-    ),
   },
   {
     id: 'fi-figma',
     label: 'Figma',
+    src: '/icon-figma.svg',
     lx: '87%',  ly: '55%',
     mx: '25%',  my: '87%',
     dur: 6.5,   delay: 2.0,
     kf: [-7, -9, 3, 9, -7, -4],
-    render: () => <SiFigma size={24} color="#F24E1E" />,
   },
   {
     id: 'fi-html',
     label: 'HTML5',
+    src: '/icon-html5.svg',
     lx: '83%',  ly: '73%',
     mx: '68%',  my: '85%',
     dur: 5.4,   delay: 1.6,
     kf: [10, 8, -3, -7, -10, 4],
-    render: () => <SiHtml5 size={24} color="#E34F26" />,
   },
 ]
 
@@ -172,7 +147,7 @@ export default function FloatingIcons() {
 
   return (
     <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 5 }}>
-      {ICONS.map(({ id, label, dur, delay, render }) => (
+      {ICONS.map(({ id, label, src, dur, delay }) => (
         <div
           key={id}
           id={id}
@@ -195,7 +170,8 @@ export default function FloatingIcons() {
             transition: 'box-shadow 0.2s, border-color 0.2s',
           }}
         >
-          {render()}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt={label} width={26} height={26} draggable={false} />
 
           {/* Tooltip label */}
           <span style={{
