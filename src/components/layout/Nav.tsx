@@ -134,17 +134,17 @@ function ContactButton() {
     <motion.a
       href="#contact"
       // Exact Figma: w-159px h-48px rounded-100px bg-white/15 backdrop-blur-7.5px
-      className="relative flex w-[159px] h-[48px] rounded-[100px] bg-[rgba(255,255,255,0.15)] backdrop-blur-[7.5px] overflow-hidden cursor-pointer"
+      className="relative flex w-[159px] h-[66px] rounded-[100px] bg-[rgba(255,255,255,0.15)] backdrop-blur-[7.5px] overflow-hidden cursor-pointer"
       initial="rest"
       whileHover="hover"
       animate="rest"
     >
-      {/* Green arrow circle — starts at left:4px, slides to left:115px on hover (x+111) */}
+      {/* Green arrow circle — starts at left:6px, slides right on hover (same 6px margin as navbar icons) */}
       <motion.div
-        className="absolute left-[4px] top-[4px] size-[40px]"
+        className="absolute left-[6px] top-[6px] size-[54px]"
         variants={{
           rest:  { x: 0 },
-          hover: { x: 111 },
+          hover: { x: 93 },
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
@@ -152,9 +152,9 @@ function ContactButton() {
         <img src="/nav-arrow.svg" alt="" className="size-full" />
       </motion.div>
 
-      {/* "Let's Talk" text — starts at left:58px, slides to left:24px on hover (x-34) */}
+      {/* "Let's Talk" text — vertically centered, slides left on hover */}
       <motion.span
-        className="absolute left-[58px] top-[14px] text-white text-[16px] font-normal leading-none tracking-[-0.04em] whitespace-nowrap"
+        className="absolute left-[74px] top-[25px] text-white text-[16px] font-normal leading-none tracking-[-0.04em] whitespace-nowrap"
         variants={{
           rest:  { x: 0 },
           hover: { x: -34 },
