@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { selectionStore } from '@/lib/selection-store'
+import { transformStore } from '@/lib/transform-store'
 
 /* ─── icon definitions ───────────────────────────────────────────────────── */
 // lx/ly = desktop positions (% of hero)
@@ -88,6 +89,8 @@ export default function FloatingIcons() {
       if (old) {
         old.classList.remove('fi-selected')
         old.style.animationPlayState = 'running'
+        // Preserve any scale/rotation the user applied
+        transformStore.applyStyle(old)
       }
       selectedId.current = ''
       selectionStore.set(null)
@@ -276,9 +279,9 @@ export default function FloatingIcons() {
 
         ${ICONS.map(({ id, kf }) => `
           @keyframes float-${id} {
-            0%,100% { transform: translate(0px, 0px) rotate(0deg) }
-            33%      { transform: translate(${kf[0]}px, ${kf[1]}px) rotate(${kf[2]}deg) }
-            66%      { transform: translate(${kf[3]}px, ${kf[4]}px) rotate(${kf[5]}deg) }
+            0%,100% { translate: 0px 0px; }
+            33%      { translate: ${kf[0]}px ${kf[1]}px; }
+            66%      { translate: ${kf[3]}px ${kf[4]}px; }
           }
         `).join('')}
       `}</style>
