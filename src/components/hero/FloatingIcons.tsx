@@ -13,7 +13,7 @@ const ICONS = [
     id: 'fi-ai',
     label: 'Illustrator',
     src: '/icon-ai.png',
-    lx: '8%',   ly: '36%',
+    lx: '21%',  ly: '30%',
     mx: '12%',  my: '7%',
     dur: 6.2,   delay: 0,
     kf: [8, -10, 4, -6, 9, -3],
@@ -22,7 +22,7 @@ const ICONS = [
     id: 'fi-ps',
     label: 'Photoshop',
     src: '/icon-ps.png',
-    lx: '10%',  ly: '60%',
+    lx: '25%',  ly: '65%',
     mx: '47%',  my: '5%',
     dur: 5.8,   delay: 1.1,
     kf: [-9, -8, -3, 7, 10, 4],
@@ -31,7 +31,7 @@ const ICONS = [
     id: 'fi-ae',
     label: 'After Effects',
     src: '/icon-ae.png',
-    lx: '84%',  ly: '32%',
+    lx: '79%',  ly: '26%',
     mx: '80%',  my: '7%',
     dur: 7.1,   delay: 0.5,
     kf: [6, -12, -4, -8, 7, 3],
@@ -40,7 +40,7 @@ const ICONS = [
     id: 'fi-figma',
     label: 'Figma',
     src: '/icon-figma.png',
-    lx: '87%',  ly: '55%',
+    lx: '79%',  ly: '60%',
     mx: '25%',  my: '87%',
     dur: 6.5,   delay: 2.0,
     kf: [-7, -9, 3, 9, -7, -4],
@@ -49,7 +49,7 @@ const ICONS = [
     id: 'fi-html',
     label: 'HTML5',
     src: '/icon-html5.png',
-    lx: '83%',  ly: '73%',
+    lx: '67%',  ly: '74%',
     mx: '68%',  my: '85%',
     dur: 5.4,   delay: 1.6,
     kf: [10, 8, -3, -7, -10, 4],
@@ -217,7 +217,7 @@ export default function FloatingIcons() {
           title={label}
           style={{
             position: 'absolute',
-            width: 56, height: 56,
+            width: 68, height: 68,
             cursor: 'grab',
             userSelect: 'none',
             pointerEvents: 'auto',
@@ -227,7 +227,7 @@ export default function FloatingIcons() {
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={label} width={56} height={56} draggable={false} style={{ display: 'block' }} />
+          <img src={src} alt={label} width={68} height={68} draggable={false} style={{ display: 'block' }} />
 
           {/* Tooltip label */}
           <span style={{
