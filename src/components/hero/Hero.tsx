@@ -717,7 +717,7 @@ export default function Hero() {
             letterSpacing: '-0.04em', lineHeight: 1.25,
             maxWidth: 'min(550px, 85vw)', textAlign: 'center',
           }}>
-            Graphic & Motion Designer from Jakarta. Figma Enthusiast, and your go-to design problem solver.
+            Graphic & Motion Designer from Jakarta. Figma Enthusiast,{' '}<br />and your go-to design problem solver.
           </p>
         </div>
 
@@ -756,7 +756,7 @@ export default function Hero() {
             letterSpacing: '-0.02em', lineHeight: 1.45,
             maxWidth: '320px', textAlign: 'center',
           }}>
-            Graphic & Motion Designer from Jakarta. Figma Enthusiast, and your go-to design problem solver.
+            Graphic & Motion Designer from Jakarta. Figma Enthusiast,{' '}<br />and your go-to design problem solver.
           </p>
           <button style={{
             backgroundColor: '#5CFF85', color: '#000000',
