@@ -7,6 +7,7 @@ const LABELS = {
   idle:    ['zoning out', 'lost tbh', 'just existing', 'thinking...', 'blank stare', 'idk anymore', 'hmm', 'figuring things out'],
   hover:   ['curious', 'tempted', 'maybe...', 'interested', 'ooh', 'should i?', 'do i dare', 'tell me more'],
   click:   ['let\'s go', 'aight', 'on it', 'done', 'ok ok', 'yep'],
+  misclick: ['why did i click that', 'nothing here', 'clicking the void', 'that did nothing', '...ok', 'oops', 'just checking'],
   scroll:  ['exploring', 'looking for something', 'what\'s down here', 'keep going'],
   flee:    ['come back!', 'wait wait', 'i don\'t bite', 'why run', 'just saying hi', 'hey!!'],
   recover: ['i did nothing', 'ok my bad', 'sorry lol', 'i\'ll behave'],
@@ -86,8 +87,12 @@ export default function CustomCursor() {
     }
 
     // Click
-    const onDown = () => setLabel(pick(LABELS.click))
-    const onUp   = () => revertToIdle(800)
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as HTMLElement
+      const isInteractive = !!t.closest('a, button, [role="button"], [data-cursor]')
+      setLabel(pick(isInteractive ? LABELS.click : LABELS.misclick))
+    }
+    const onUp = () => revertToIdle(800)
 
     // Scroll
     const onScroll = () => {
