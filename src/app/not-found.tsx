@@ -87,11 +87,13 @@ export default function NotFound() {
 
       if (dist < FLEE_DIST && mouseX > -900) {
         if (state !== 'flee') startFlee(mouseX, mouseY)
-        // Keep updating flee target while mouse is close
-        const b   = bounds()
-        const len = Math.sqrt(dx * dx + dy * dy) || 1
-        targetX = clamp(posX + (-dx / len) * 300, b.minX, b.maxX)
-        targetY = clamp(posY + (-dy / len) * 300, b.minY, b.maxY)
+        // Smoothly steer flee target — lerp instead of snap to avoid spasm when cornered
+        const b      = bounds()
+        const len    = Math.sqrt(dx * dx + dy * dy) || 1
+        const rawX   = clamp(posX + (-dx / len) * 300, b.minX, b.maxX)
+        const rawY   = clamp(posY + (-dy / len) * 300, b.minY, b.maxY)
+        targetX += (rawX - targetX) * 0.12
+        targetY += (rawY - targetY) * 0.12
       } else if (state === 'flee') {
         startWander()
       }
