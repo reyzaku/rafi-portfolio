@@ -28,6 +28,7 @@ export default function CustomCursor() {
   const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isMoving    = useRef(false)
   const isHovering  = useRef(false)
+  const isClicking  = useRef(false)
 
   useEffect(() => {
     const lbl = labelRef.current!
@@ -38,6 +39,7 @@ export default function CustomCursor() {
 
     // Single source of truth for going idle — cancels ALL competing timers first
     function goIdle() {
+      if (isClicking.current) return  // don't interrupt a held click
       if (revertTimer.current) { clearTimeout(revertTimer.current); revertTimer.current = null }
       if (scrollTimer.current) { clearTimeout(scrollTimer.current); scrollTimer.current = null }
       setLabel(pick(LABELS.idle))
@@ -93,12 +95,14 @@ export default function CustomCursor() {
 
     // Click
     const onDown = (e: MouseEvent) => {
+      isClicking.current = true
       const t = e.target as HTMLElement
       const isInteractive = !!t.closest('a, button, [role="button"], [data-cursor]')
       if (revertTimer.current) { clearTimeout(revertTimer.current); revertTimer.current = null }
+      if (moveTimer.current)   { clearTimeout(moveTimer.current);   moveTimer.current   = null }
       setLabel(pick(isInteractive ? LABELS.click : LABELS.misclick))
     }
-    const onUp = () => revertToIdle(800)
+    const onUp = () => { isClicking.current = false; revertToIdle(800) }
 
     // Scroll
     const onScroll = () => {
