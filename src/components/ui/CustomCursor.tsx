@@ -40,7 +40,7 @@ export default function CustomCursor() {
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 z-[9999] pointer-events-none will-change-transform"
+      className="fixed top-0 left-0 z-[999999] pointer-events-none will-change-transform"
       style={{ opacity: visible ? 1 : 0 }}
     >
       {/* Arrow */}
