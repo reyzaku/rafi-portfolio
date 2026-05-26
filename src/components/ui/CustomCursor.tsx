@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 const LABELS = {
+  move:    ['weeeeee', 'zoom zoom', 'vroom vroom', 'woooosh', 'look at me go', 'going places', 'on the move', 'gliding...', 'speedy', 'wheeeee', 'zoom~'],
   idle:    ['zoning out', 'lost tbh', 'just existing', 'thinking...', 'blank stare', 'idk anymore', 'hmm', 'figuring things out'],
   hover:   ['curious', 'tempted', 'maybe...', 'interested', 'ooh', 'should i?', 'do i dare', 'tell me more'],
   click:   ['let\'s go', 'aight', 'on it', 'done', 'ok ok', 'yep'],
@@ -23,6 +24,9 @@ export default function CustomCursor() {
   const idleTimer   = useRef<ReturnType<typeof setTimeout> | null>(null)
   const revertTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const moveTimer   = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isMoving    = useRef(false)
+  const isHovering  = useRef(false)
 
   useEffect(() => {
     const lbl = labelRef.current!
@@ -51,16 +55,34 @@ export default function CustomCursor() {
       pos.current = { x: e.clientX, y: e.clientY }
       if (!visible) setVisible(true)
       resetIdleTimer()
+
+      // Only show move label when transitioning from still, and not hovering/clicking
+      if (!isMoving.current && !isHovering.current) {
+        isMoving.current = true
+        setLabel(pick(LABELS.move))
+      }
+      // Debounce — revert to idle shortly after movement stops
+      if (moveTimer.current) clearTimeout(moveTimer.current)
+      moveTimer.current = setTimeout(() => {
+        isMoving.current = false
+        if (!isHovering.current) revertToIdle(0)
+      }, 350)
     }
 
     // Hover interactive elements
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement
-      if (t.closest('a, button, [role="button"], [data-cursor]')) setLabel(pick(LABELS.hover))
+      if (t.closest('a, button, [role="button"], [data-cursor]')) {
+        isHovering.current = true
+        setLabel(pick(LABELS.hover))
+      }
     }
     const onOut = (e: MouseEvent) => {
       const t = e.target as HTMLElement
-      if (t.closest('a, button, [role="button"], [data-cursor]')) revertToIdle(600)
+      if (t.closest('a, button, [role="button"], [data-cursor]')) {
+        isHovering.current = false
+        revertToIdle(600)
+      }
     }
 
     // Click
@@ -122,6 +144,7 @@ export default function CustomCursor() {
       if (idleTimer.current)   clearTimeout(idleTimer.current)
       if (revertTimer.current) clearTimeout(revertTimer.current)
       if (scrollTimer.current) clearTimeout(scrollTimer.current)
+      if (moveTimer.current)   clearTimeout(moveTimer.current)
     }
   }, [visible])
 
