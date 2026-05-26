@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
 function easeOutCubic(t: number) {
@@ -28,10 +28,22 @@ function animateTo(
 }
 
 export default function WelcomeScreen() {
-  const screenRef = useRef<HTMLDivElement>(null)
-  const cursorRef = useRef<HTMLDivElement>(null)
+  const screenRef  = useRef<HTMLDivElement>(null)
+  const cursorRef  = useRef<HTMLDivElement>(null)
+  const pulseRef   = useRef<HTMLParagraphElement>(null)
   const [gone,    setGone]    = useState(false)
   const [clicked, setClicked] = useState(false)
+
+  // Switch pulse text to looping pulse animation after fade-in completes
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (pulseRef.current) {
+        pulseRef.current.style.animation = 'ws-pulse 2s ease-in-out infinite'
+        pulseRef.current.style.opacity   = '1'
+      }
+    }, 1150 + 220 + 50) // fade-in delay + duration + buffer
+    return () => clearTimeout(t)
+  }, [])
 
   function startExit() {
     if (clicked) return
@@ -102,9 +114,10 @@ export default function WelcomeScreen() {
       }}>Welcome to my portfolio</h1>
 
       {/* Pulsing CTA */}
-      <p className="ws-pulse" style={{
+      <p ref={pulseRef} className="ws-pulse" style={{
         fontSize: 'clamp(10px, 1.3vw, 12px)', fontWeight: 500,
         letterSpacing: '0.2em', textTransform: 'uppercase',
+        color: 'rgba(255,255,255,1)',
       }}>Click anywhere to see my masterpiece</p>
 
       {/* Rafi cursor */}
@@ -146,17 +159,14 @@ export default function WelcomeScreen() {
         .ws-pulse {
           opacity: 0;
           transform: translateY(6px);
-          animation: ws-in-pulse 0.22s ease-out 1.15s forwards, ws-pulse 2.8s ease-in-out 1.5s infinite;
+          animation: ws-in 0.22s ease-out 1.15s forwards;
         }
         @keyframes ws-in {
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes ws-in-pulse {
-          to { opacity: 0.4; transform: translateY(0); }
-        }
         @keyframes ws-pulse {
-          0%, 100% { opacity: 0.4; }
-          50%       { opacity: 0.85; }
+          0%, 100% { opacity: 0.2; }
+          50%       { opacity: 1; }
         }
       `}</style>
     </div>
