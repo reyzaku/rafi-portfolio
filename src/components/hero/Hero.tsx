@@ -255,7 +255,7 @@ function CtaButton() {
   const hovering = useRef(false)
 
   useEffect(() => {
-    const EASE = 0.072  // lower = lazier/smoother
+    const EASE = 0.072
 
     function tick() {
       const btn = btnRef.current
@@ -267,25 +267,43 @@ function CtaButton() {
       btn.style.setProperty('--mx', `${current.current.x.toFixed(2)}%`)
       btn.style.setProperty('--my', `${current.current.y.toFixed(2)}%`)
 
+      // Stop loop once close enough to target (idle)
+      const dx = Math.abs(target.current.x - current.current.x)
+      const dy = Math.abs(target.current.y - current.current.y)
+      if (dx < 0.05 && dy < 0.05) {
+        btn.style.setProperty('--mx', `${target.current.x}%`)
+        btn.style.setProperty('--my', `${target.current.y}%`)
+        rafRef.current = 0
+        return
+      }
+
       rafRef.current = requestAnimationFrame(tick)
     }
 
-    rafRef.current = requestAnimationFrame(tick)
+    function startLoop() {
+      if (!rafRef.current) rafRef.current = requestAnimationFrame(tick)
+    }
+
+    // Expose startLoop so event handlers can kick it off
+    ;(btnRef.current as HTMLButtonElement & { _startLoop?: () => void })!._startLoop = startLoop
+
     return () => cancelAnimationFrame(rafRef.current)
   }, [])
 
   function onMouseMove(e: React.MouseEvent<HTMLButtonElement>) {
-    const btn = btnRef.current
+    const btn = btnRef.current as (HTMLButtonElement & { _startLoop?: () => void }) | null
     if (!btn) return
     hovering.current = true
     const r = btn.getBoundingClientRect()
     target.current.x = ((e.clientX - r.left) / r.width)  * 100
     target.current.y = ((e.clientY - r.top)  / r.height) * 100
+    btn._startLoop?.()
   }
 
   function onMouseLeave() {
     hovering.current = false
-    target.current = { x: 50, y: 50 }
+    target.current = { x: 50, y: 50 };
+    (btnRef.current as HTMLButtonElement & { _startLoop?: () => void })?._startLoop?.()
   }
 
   return (
