@@ -4,9 +4,10 @@ import { useEffect, useRef } from 'react'
 import Nav from '@/components/layout/Nav'
 import Link from 'next/link'
 
-const FLEE_LABELS   = ['Rafi · nope!', 'Rafi · bye!', 'Rafi · not today', 'Rafi · leave me alone']
-const IDLE_LABELS   = ['Rafi · chilling...', 'Rafi · hmm...', 'Rafi · vibing', 'Rafi · ...']
-const WANDER_LABELS = ['Rafi · exploring...', 'Rafi · where am i', 'Rafi · just wandering']
+const FLEE_LABELS     = ['Rafi · nope!', 'Rafi · bye!', 'Rafi · not today', 'Rafi · leave me alone']
+const IDLE_LABELS     = ['Rafi · chilling...', 'Rafi · hmm...', 'Rafi · vibing', 'Rafi · ...']
+const RECOVERY_LABELS = ['Rafi · phew...', 'Rafi · that was close', 'Rafi · ok ok...', 'Rafi · 😮‍💨']
+const WANDER_LABELS   = ['Rafi · exploring...', 'Rafi · where am i', 'Rafi · just wandering']
 
 function pick(arr: string[]) { return arr[Math.floor(Math.random() * arr.length)] }
 
@@ -24,8 +25,8 @@ export default function NotFound() {
 
     // Wander spring
     const WK = 0.005, WD = 0.75
-    // Flee spring — faster reaction
-    const FK = 0.032, FD = 0.78
+    // Flee spring — faster than wander but not instant
+    const FK = 0.014, FD = 0.78
 
     let posX = window.innerWidth  / 2
     let posY = window.innerHeight / 2
@@ -82,6 +83,12 @@ export default function NotFound() {
       idleTimer = window.setTimeout(startWander, 1000 + Math.random() * 2500)
     }
 
+    function startRecovery() {
+      state = 'idle'
+      lbl.textContent = pick(RECOVERY_LABELS)
+      idleTimer = window.setTimeout(startWander, 1500 + Math.random() * 1500)
+    }
+
     function startFlee() {
       if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0 }
       state = 'flee'
@@ -125,12 +132,12 @@ export default function NotFound() {
         startIdle()
       }
 
-      // Flee settled → back to wander, re-arm detection
+      // Flee settled → catch breath, then re-arm detection
       if (state === 'flee'
           && Math.abs(velX) < 0.25 && Math.abs(velY) < 0.25
           && Math.abs(targetX - posX) < 5 && Math.abs(targetY - posY) < 5) {
         canDetect = true
-        startWander()
+        startRecovery()
       }
 
       rafId = requestAnimationFrame(loop)
