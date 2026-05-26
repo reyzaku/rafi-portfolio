@@ -5,22 +5,60 @@ import { selectionStore } from '@/lib/selection-store'
 import { transformStore, correctionBus, CorrectionReason } from '@/lib/transform-store'
 import FloatingIcons from './FloatingIcons'
 
-const DRAG_MESSAGES: Record<string, { msg: string; emoji: string }> = {
-  'el-eyebrow':  { msg: "That's literally the page title bro.",      emoji: '😐' },
-  'el-headline': { msg: "Bro. That's literally my name.",            emoji: '🙄' },
-  'el-subtext':  { msg: "Now no one knows what I do.",               emoji: '😤' },
+type Msg = { msg: string; emoji: string }
+
+const DRAG_MESSAGES: Record<string, Msg> = {
+  'el-eyebrow':  { msg: "That's literally the page title bro.",   emoji: '😐' },
+  'el-headline': { msg: "Bro. That's literally my name.",         emoji: '🙄' },
+  'el-subtext':  { msg: "Now no one knows what I do.",            emoji: '😤' },
 }
 
-const SCALE_MESSAGES: Record<string, { msg: string; emoji: string }> = {
-  'el-eyebrow':  { msg: "PORTFOLIO is not a balloon.",       emoji: '😑' },
-  'el-headline': { msg: "My name is not stretchable.",       emoji: '😤' },
-  'el-subtext':  { msg: "Text doesn't stretch like that.",   emoji: '🫠' },
+const SCALE_MESSAGES: Record<string, { tooBig: Msg; tooSmall: Msg }> = {
+  'el-eyebrow': {
+    tooBig:   { msg: "PORTFOLIO is not a billboard.",    emoji: '😑' },
+    tooSmall: { msg: "No one can read that.",            emoji: '🔍' },
+  },
+  'el-headline': {
+    tooBig:   { msg: "My name is not a banner.",         emoji: '😤' },
+    tooSmall: { msg: "My name isn't invisible.",         emoji: '😶' },
+  },
+  'el-subtext': {
+    tooBig:   { msg: "Nobody reads at that size.",       emoji: '🫠' },
+    tooSmall: { msg: "Even ants can't read that.",       emoji: '😑' },
+  },
 }
 
-const ROTATE_MESSAGES: Record<string, { msg: string; emoji: string }> = {
-  'el-eyebrow':  { msg: "Titles go horizontal. Always.",    emoji: '😐' },
-  'el-headline': { msg: "My name is not tilted.",           emoji: '🙃' },
-  'el-subtext':  { msg: "No one reads diagonally.",         emoji: '😑' },
+const ROTATE_MESSAGES: Record<string, { tilted: Msg; sideways: Msg; upsideDown: Msg }> = {
+  'el-eyebrow': {
+    tilted:     { msg: "Titles go horizontal. Always.",           emoji: '😐' },
+    sideways:   { msg: "Did you fall asleep on your keyboard?",   emoji: '😒' },
+    upsideDown: { msg: "What are you even doing.",                emoji: '🙃' },
+  },
+  'el-headline': {
+    tilted:     { msg: "My name doesn't lean.",                   emoji: '🙃' },
+    sideways:   { msg: "Rotate your monitor, not my name.",       emoji: '😒' },
+    upsideDown: { msg: "I'm not Australian.",                     emoji: '🙃' },
+  },
+  'el-subtext': {
+    tilted:     { msg: "No one reads at an angle.",               emoji: '😑' },
+    sideways:   { msg: "Turn your phone back. Now.",              emoji: '😒' },
+    upsideDown: { msg: "This isn't a poster for ants.",           emoji: '🙃' },
+  },
+}
+
+function getScaleMsg(id: string, scale: number): Msg {
+  const entry = SCALE_MESSAGES[id]
+  if (!entry) return { msg: "Please don't do that.", emoji: '😐' }
+  return scale > 1 ? entry.tooBig : entry.tooSmall
+}
+
+function getRotateMsg(id: string, rotation: number): Msg {
+  const entry = ROTATE_MESSAGES[id]
+  if (!entry) return { msg: "Please don't do that.", emoji: '😐' }
+  const norm = ((rotation % 360) + 360) % 360
+  if (norm >= 150 && norm <= 210) return entry.upsideDown
+  if ((norm >= 60 && norm <= 120) || (norm >= 240 && norm <= 300)) return entry.sideways
+  return entry.tilted
 }
 
 function runSpring(
@@ -199,8 +237,10 @@ export default function Hero() {
       selectionStore.set(null)
       el.classList.add('correcting')
 
-      const msgs = reason === 'scale' ? SCALE_MESSAGES : ROTATE_MESSAGES
-      const cfg  = msgs[el.id] || { msg: "Please don't do that.", emoji: '😐' }
+      const { scale, rotation } = transformStore.get(el.id)
+      const cfg = reason === 'scale'
+        ? getScaleMsg(el.id, scale)
+        : getRotateMsg(el.id, rotation)
       const hr   = hero.getBoundingClientRect()
       const cur  = cursorRef.current!
       const lbl  = cursorLabel.current!
