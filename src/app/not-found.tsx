@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import Nav from '@/components/layout/Nav'
 import Link from 'next/link'
 
+const FLEE_LABELS   = ['Rafi · nope!', 'Rafi · bye!', 'Rafi · not today', 'Rafi · leave me alone']
 const IDLE_LABELS   = ['Rafi · chilling...', 'Rafi · hmm...', 'Rafi · vibing', 'Rafi · ...']
 const WANDER_LABELS = ['Rafi · exploring...', 'Rafi · where am i', 'Rafi · just wandering']
 
@@ -17,17 +18,22 @@ export default function NotFound() {
     const cur = cursorRef.current!
     const lbl = labelRef.current!
 
-    const PAD = 120
+    const PAD       = 120
+    const FLEE_DIST = 160
+    const FLEE_SAFE = 260  // flee target must be at least this far from mouse
 
-    // Higher stiffness + lower damping = reaches target before accumulating too much velocity → minimal bounce
-    const K = 0.005
-    const D = 0.75
+    // Wander spring
+    const WK = 0.005, WD = 0.75
+    // Flee spring — faster reaction
+    const FK = 0.032, FD = 0.78
 
     let posX = window.innerWidth  / 2
     let posY = window.innerHeight / 2
     let velX = 0, velY = 0
     let targetX = posX, targetY = posY
-    let state: 'wander' | 'idle' = 'wander'
+    let mouseX = -999, mouseY = -999
+    let state: 'wander' | 'idle' | 'flee' = 'wander'
+    let canDetect = true
     let idleTimer = 0
     let rafId = 0
 
@@ -50,6 +56,18 @@ export default function NotFound() {
       }
     }
 
+    function safeFlee() {
+      // Pick a random target that's far enough from the mouse
+      for (let i = 0; i < 20; i++) {
+        const t = randomTarget()
+        const dx = t.x - mouseX
+        const dy = t.y - mouseY
+        if (Math.sqrt(dx * dx + dy * dy) >= FLEE_SAFE) return t
+      }
+      // Fallback: just use randomTarget if no safe spot found in 20 tries
+      return randomTarget()
+    }
+
     function startWander() {
       state = 'wander'
       const t = randomTarget()
@@ -64,12 +82,32 @@ export default function NotFound() {
       idleTimer = window.setTimeout(startWander, 1000 + Math.random() * 2500)
     }
 
+    function startFlee() {
+      if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0 }
+      state = 'flee'
+      canDetect = false
+      lbl.textContent = pick(FLEE_LABELS)
+      const t = safeFlee()
+      targetX = t.x
+      targetY = t.y
+    }
+
     cur.style.opacity = '1'
     startWander()
 
     function loop() {
-      velX = (velX + (targetX - posX) * K) * D
-      velY = (velY + (targetY - posY) * K) * D
+      // Detection — one-shot, only when canDetect is true
+      if (canDetect && mouseX > -900) {
+        const dx   = mouseX - posX
+        const dy   = mouseY - posY
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist < FLEE_DIST) startFlee()
+      }
+
+      const k = state === 'flee' ? FK : WK
+      const d = state === 'flee' ? FD : WD
+      velX = (velX + (targetX - posX) * k) * d
+      velY = (velY + (targetY - posY) * k) * d
       posX += velX
       posY += velY
 
@@ -80,18 +118,35 @@ export default function NotFound() {
       cur.style.left = posX + 'px'
       cur.style.top  = posY + 'px'
 
-      if (state === 'wander' && Math.abs(velX) < 0.25 && Math.abs(velY) < 0.25
+      // Wander arrived → idle
+      if (state === 'wander'
+          && Math.abs(velX) < 0.25 && Math.abs(velY) < 0.25
           && Math.abs(targetX - posX) < 5 && Math.abs(targetY - posY) < 5) {
         startIdle()
+      }
+
+      // Flee settled → back to wander, re-arm detection
+      if (state === 'flee'
+          && Math.abs(velX) < 0.25 && Math.abs(velY) < 0.25
+          && Math.abs(targetX - posX) < 5 && Math.abs(targetY - posY) < 5) {
+        canDetect = true
+        startWander()
       }
 
       rafId = requestAnimationFrame(loop)
     }
     rafId = requestAnimationFrame(loop)
 
+    const onMove  = (e: MouseEvent) => { mouseX = e.clientX; mouseY = e.clientY }
+    const onLeave = () => { mouseX = -999; mouseY = -999 }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseleave', onLeave)
+
     return () => {
       cancelAnimationFrame(rafId)
       clearTimeout(idleTimer)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseleave', onLeave)
     }
   }, [])
 
