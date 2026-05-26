@@ -512,13 +512,15 @@ export default function Hero() {
       const cfg = reason === 'scale'
         ? getScaleMsg(el.id, scale)
         : getRotateMsg(el.id, rotation)
-      const hr   = hero.getBoundingClientRect()
       const cur  = cursorRef.current!
       const lbl  = cursorLabel.current!
       const tst  = toastRef.current!
 
-      const elVX = hr.left + parseFloat(el.style.left)
-      const elVY = hr.top  + parseFloat(el.style.top)
+      // Use getBoundingClientRect so the cursor targets the actual visual
+      // top-left corner of the element after scale/rotation is applied
+      const rect = el.getBoundingClientRect()
+      const elVX = rect.left
+      const elVY = rect.top
 
       toastEmoji.current!.textContent = cfg.emoji
       toastMsg.current!.textContent   = cfg.msg
