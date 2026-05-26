@@ -139,9 +139,9 @@ function ContactButton() {
       whileHover="hover"
       animate="rest"
     >
-      {/* Green arrow circle — starts at left:6px, slides right on hover (same 6px margin as navbar icons) */}
+      {/* Green arrow circle — 48px circle with 9px margin inside 66px container */}
       <motion.div
-        className="absolute left-[6px] top-[6px] size-[54px]"
+        className="absolute left-[9px] top-[9px] size-[48px]"
         variants={{
           rest:  { x: 0 },
           hover: { x: 93 },
@@ -154,7 +154,7 @@ function ContactButton() {
 
       {/* "Let's Talk" text — vertically centered, slides left on hover */}
       <motion.span
-        className="absolute left-[74px] top-[25px] text-white text-[16px] font-normal leading-none tracking-[-0.04em] whitespace-nowrap"
+        className="absolute left-[70px] top-[25px] text-white text-[16px] font-normal leading-none tracking-[-0.04em] whitespace-nowrap"
         variants={{
           rest:  { x: 0 },
           hover: { x: -34 },
