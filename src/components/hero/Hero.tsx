@@ -538,7 +538,7 @@ export default function Hero() {
       <div ref={toastRef} style={{
         position: 'fixed', zIndex: 9997, pointerEvents: 'none',
         background: 'rgba(1,25,16,0.96)', border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: 10, padding: '11px 16px', fontSize: '0.82rem', color: '#fff',
+        borderRadius: 12, padding: '14px 20px', fontSize: '1rem', color: '#fff', fontWeight: 500,
         whiteSpace: 'nowrap', opacity: 0, transform: 'translateY(8px)',
         transition: 'opacity 0.22s, transform 0.22s', backdropFilter: 'blur(16px)',
         left: 0, top: 0,
