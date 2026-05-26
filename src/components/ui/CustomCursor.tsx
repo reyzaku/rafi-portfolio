@@ -2,17 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+const BASE = '@guest'
+
 const LABELS = {
-  base:    'awesome-guest @guest',
-  idle:    ['what am i doing here', 'where do i even go', 'lost tbh', 'just existing rn', '*blank stare*', 'should i scroll?', 'figuring things out', 'hmm...'],
-  hover:   ['what\'s this?', 'should i click?', 'curious...', 'maybe...', 'ooh', 'tempted ngl', 'interesting...', 'do i dare'],
-  click:   ['let\'s go', 'aight', 'ok ok', 'done', 'yep', 'on it'],
-  scroll:  ['looking for something', 'what\'s down here', 'exploring...', 'keep going'],
-  // 404 — reacting to Rafi fleeing
-  flee:    ['come back!', 'wait wait wait', 'i don\'t bite', 'why does everyone run', 'i just want to say hi', 'hey!!'],
-  recover: ['i wasn\'t even doing anything', 'ok my bad', 'sorry lol', 'i\'ll behave'],
-  // Landing — reacting to Rafi correcting elements
-  correct: ['ok ok my bad', 'sorry sorry', 'i was just playing', 'i\'ll put it back', 'ok i get it', 'rafi pls'],
+  idle:    ['@zoning out', '@lost tbh', '@just existing', '@thinking...', '@blank stare', '@idk anymore', '@hmm', '@figuring things out'],
+  hover:   ['@curious', '@tempted', '@maybe...', '@interested', '@ooh', '@should i?', '@do i dare', '@tell me more'],
+  click:   ['@let\'s go', '@aight', '@on it', '@done', '@ok ok', '@yep'],
+  scroll:  ['@exploring', '@looking for something', '@what\'s down here', '@keep going'],
+  flee:    ['@come back!', '@wait wait', '@i don\'t bite', '@why run', '@just saying hi', '@hey!!'],
+  recover: ['@i did nothing', '@ok my bad', '@sorry lol', '@i\'ll behave'],
+  correct: ['@ok my bad', '@sorry sorry', '@i was playing', '@i\'ll put it back', '@ok i get it', '@rafi pls'],
 }
 
 function pick(arr: string[]) { return arr[Math.floor(Math.random() * arr.length)] }
@@ -36,12 +35,12 @@ export default function CustomCursor() {
 
     function revertAfter(ms: number) {
       if (revertTimer.current) clearTimeout(revertTimer.current)
-      revertTimer.current = setTimeout(() => setLabel(LABELS.base), ms)
+      revertTimer.current = setTimeout(() => setLabel(BASE), ms)
     }
 
     function resetIdle() {
       if (idleTimer.current) clearTimeout(idleTimer.current)
-      idleTimer.current = setTimeout(() => setLabel(pick(LABELS.idle)), 3000)
+      idleTimer.current = setTimeout(() => { setLabel(pick(LABELS.idle)); revertAfter(3000) }, 3000)
     }
 
     // Movement
@@ -58,7 +57,7 @@ export default function CustomCursor() {
     }
     const onOut = (e: MouseEvent) => {
       const t = e.target as HTMLElement
-      if (t.closest('a, button, [role="button"], [data-cursor]')) setLabel(LABELS.base)
+      if (t.closest('a, button, [role="button"], [data-cursor]')) setLabel(BASE)
     }
 
     // Click
@@ -69,7 +68,7 @@ export default function CustomCursor() {
     const onScroll = () => {
       setLabel(pick(LABELS.scroll))
       if (scrollTimer.current) clearTimeout(scrollTimer.current)
-      scrollTimer.current = setTimeout(() => setLabel(LABELS.base), 800)
+      scrollTimer.current = setTimeout(() => setLabel(BASE), 800)
     }
 
     // Cross-page Rafi reactions
@@ -145,11 +144,9 @@ export default function CustomCursor() {
           boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
         }}
       >
-        <span
-          ref={labelRef}
-          className="text-black font-medium text-[13px] leading-none tracking-[-0.04em] font-sans"
-        >
-          awesome-guest @guest
+        <span className="text-black font-medium text-[13px] leading-none tracking-[-0.04em] font-sans">
+          awesome-guest{' '}
+          <span ref={labelRef}>{BASE}</span>
         </span>
       </div>
     </div>
