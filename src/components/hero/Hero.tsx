@@ -12,6 +12,7 @@ const DRAG_MESSAGES: Record<string, Msg> = {
   'el-eyebrow':  { msg: "That's literally the page title bro.",   emoji: '😐' },
   'el-headline': { msg: "Bro. That's literally my name.",         emoji: '🙄' },
   'el-subtext':  { msg: "Now no one knows what I do.",            emoji: '😤' },
+  'el-hint':     { msg: "HOW DARE YOU",                           emoji: '😤' },
 }
 
 const SCALE_MESSAGES: Record<string, { tooBig: Msg; tooSmall: Msg }> = {
@@ -26,6 +27,10 @@ const SCALE_MESSAGES: Record<string, { tooBig: Msg; tooSmall: Msg }> = {
   'el-subtext': {
     tooBig:   { msg: "Nobody reads at that size.",       emoji: '🫠' },
     tooSmall: { msg: "This isn't a poster for ants.",    emoji: '😑' },
+  },
+  'el-hint': {
+    tooBig:   { msg: "HOW DARE YOU MAKE IT BIGGER",      emoji: '😤' },
+    tooSmall: { msg: "HOW DARE YOU MAKE IT SMALLER",     emoji: '😤' },
   },
 }
 
@@ -43,7 +48,12 @@ const ROTATE_MESSAGES: Record<string, { tilted: Msg; sideways: Msg; upsideDown: 
   'el-subtext': {
     tilted:     { msg: "No one reads at an angle.",               emoji: '😑' },
     sideways:   { msg: "Turn your phone back. Now.",              emoji: '😒' },
-    upsideDown: { msg: "Bro who reads upside down.",               emoji: '🙃' },
+    upsideDown: { msg: "Bro who reads upside down.",              emoji: '🙃' },
+  },
+  'el-hint': {
+    tilted:     { msg: "HOW DARE YOU TILT IT",                    emoji: '😤' },
+    sideways:   { msg: "HOW DARE YOU TURN IT SIDEWAYS",           emoji: '😤' },
+    upsideDown: { msg: "HOW DARE YOU FLIP IT UPSIDE DOWN",        emoji: '😤' },
   },
 }
 
@@ -465,14 +475,15 @@ export default function Hero() {
           </button>
         </div>
 
-        {/* Hint — desktop only */}
-        <div className="hidden md:block" style={{
+        {/* Hint — desktop only, draggable */}
+        <div id="el-hint" className="draggable hidden md:flex" style={{
           position: 'absolute', bottom: '3%', left: '50%', transform: 'translateX(-50%)',
           fontSize: '0.66rem', letterSpacing: '0.18em', textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.55)', zIndex: 10, pointerEvents: 'none',
+          color: 'rgba(255,255,255,0.55)', zIndex: 10,
           whiteSpace: 'nowrap', animation: 'hpulse 3s ease-in-out infinite',
+          alignItems: 'center', gap: 6,
         }}>
-          <HandRaisedIcon style={{ width: 16, height: 16, display: 'inline', verticalAlign: 'middle', marginRight: 6 }} />
+          <HandRaisedIcon style={{ width: 16, height: 16, flexShrink: 0 }} />
           drag anything &nbsp;·&nbsp; i dare you
         </div>
 
