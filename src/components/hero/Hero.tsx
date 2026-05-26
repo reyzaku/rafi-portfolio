@@ -8,68 +8,249 @@ import { HandRaisedIcon } from '@heroicons/react/24/solid'
 
 type Msg = { msg: string; emoji: string }
 
-const DRAG_MESSAGES: Record<string, Msg> = {
-  'el-eyebrow':  { msg: "That's literally the page title bro.",   emoji: '😐' },
-  'el-headline': { msg: "Bro. That's literally my name.",         emoji: '🙄' },
-  'el-subtext':  { msg: "Now no one knows what I do.",            emoji: '😤' },
-  'el-hint':     { msg: "HOW DARE YOU",                           emoji: '😤' },
+function pick(arr: Msg[]): Msg {
+  return arr[Math.floor(Math.random() * arr.length)]
 }
 
-const SCALE_MESSAGES: Record<string, { tooBig: Msg; tooSmall: Msg }> = {
+const DRAG_MESSAGES: Record<string, Msg[]> = {
+  'el-eyebrow': [
+    { msg: "Bro, that's my page title.",             emoji: '😑' },
+    { msg: "Where are you even taking it?",          emoji: '🤨' },
+    { msg: "That's not where that goes bro.",        emoji: '😒' },
+    { msg: "Come on, put it back.",                  emoji: '😤' },
+  ],
+  'el-headline': [
+    { msg: "Bro. That's literally my name.",         emoji: '🙄' },
+    { msg: "Stop moving my name around.",            emoji: '😤' },
+    { msg: "Why would you do that.",                 emoji: '😑' },
+    { msg: "Put my name back bro.",                  emoji: '😒' },
+  ],
+  'el-subtext': [
+    { msg: "Now no one knows what I do.",            emoji: '😤' },
+    { msg: "Bro, that's my description.",            emoji: '😑' },
+    { msg: "How are they gonna know who I am?",      emoji: '🤨' },
+    { msg: "Put it back where you found it.",        emoji: '😒' },
+  ],
+  'el-hint': [
+    { msg: "HOW DARE YOU",                           emoji: '😤' },
+    { msg: "You really said 'i dare you' huh.",      emoji: '🙄' },
+    { msg: "I literally told you not to.",           emoji: '😑' },
+    { msg: "Really bro, really?",                    emoji: '😒' },
+  ],
+  'fi-ai':    [{ msg: "Don't move my Illustrator bro.",      emoji: '😑' }, { msg: "Bro, that's my tool not a toy.",   emoji: '😒' }, { msg: "Put Illustrator back.",            emoji: '😤' }],
+  'fi-ps':    [{ msg: "Photoshop goes where I put it.",      emoji: '😑' }, { msg: "Don't touch my PS bro.",           emoji: '😒' }, { msg: "Why are you moving Photoshop.",    emoji: '🤨' }],
+  'fi-ae':    [{ msg: "After Effects is not a toy.",         emoji: '😑' }, { msg: "Put AE back bro.",                 emoji: '😒' }, { msg: "That's my motion tool, hands off.",emoji: '😤' }],
+  'fi-figma': [{ msg: "Don't move Figma, I need that.",      emoji: '😑' }, { msg: "Figma stays where it is bro.",     emoji: '😒' }, { msg: "Why are you like this.",           emoji: '🤨' }],
+  'fi-html':  [{ msg: "Even HTML5 didn't deserve this.",     emoji: '😑' }, { msg: "Stop moving my tools around.",     emoji: '😒' }, { msg: "Put HTML back bro.",               emoji: '😤' }],
+}
+
+const SCALE_MESSAGES: Record<string, { tooBig: Msg[]; tooSmall: Msg[] }> = {
   'el-eyebrow': {
-    tooBig:   { msg: "PORTFOLIO is not a billboard.",    emoji: '😑' },
-    tooSmall: { msg: "No one can read that.",            emoji: '🔍' },
+    tooBig: [
+      { msg: "Aight bro, what the flip.",            emoji: '😤' },
+      { msg: "I'm working so hard for this.",        emoji: '😩' },
+      { msg: "Why so big?",                          emoji: '🤨' },
+      { msg: "You messed up my design.",             emoji: '😤' },
+    ],
+    tooSmall: [
+      { msg: "Can you even read it?",                emoji: '😑' },
+      { msg: "Bro, even ants complaining about this.",emoji: '😒' },
+      { msg: "You think you are funny huh?",         emoji: '🙄' },
+      { msg: "haha, smoll like your pp.",            emoji: '😭' },
+    ],
   },
   'el-headline': {
-    tooBig:   { msg: "My name is not a banner.",         emoji: '😤' },
-    tooSmall: { msg: "My name isn't invisible.",         emoji: '😶' },
+    tooBig: [
+      { msg: "Way too big my dude.",                 emoji: '🤨' },
+      { msg: "Stop it!",                             emoji: '😤' },
+      { msg: "That's enough man.",                   emoji: '😑' },
+      { msg: "Yeah, no!",                            emoji: '😒' },
+    ],
+    tooSmall: [
+      { msg: "haha, smoll like your pp.",            emoji: '😭' },
+      { msg: "This is a headline, supposed to be big.", emoji: '😤' },
+      { msg: "Antman not approving this.",           emoji: '😑' },
+      { msg: "Can you even read it?",                emoji: '🙄' },
+    ],
   },
   'el-subtext': {
-    tooBig:   { msg: "Nobody reads at that size.",       emoji: '🫠' },
-    tooSmall: { msg: "This isn't a poster for ants.",    emoji: '😑' },
+    tooBig: [
+      { msg: "Nope, too big!",                       emoji: '😑' },
+      { msg: "This is meant to be small!",           emoji: '😤' },
+      { msg: "What are you doing??",                 emoji: '🤨' },
+      { msg: "nooo….",                               emoji: '😩' },
+    ],
+    tooSmall: [
+      { msg: "This text is already small bro.",      emoji: '😤' },
+      { msg: "This ain't your pp.",                  emoji: '😭' },
+      { msg: "Why so smoll.",                        emoji: '😒' },
+      { msg: "Way too small buddy.",                 emoji: '🙄' },
+    ],
   },
   'el-hint': {
-    tooBig:   { msg: "HOW DARE YOU MAKE IT BIGGER",      emoji: '😤' },
-    tooSmall: { msg: "HOW DARE YOU MAKE IT SMALLER",     emoji: '😤' },
+    tooBig: [
+      { msg: "nope, just nope…",                     emoji: '😑' },
+      { msg: "Too much!",                            emoji: '😤' },
+      { msg: "This is meant to be small.",           emoji: '🤨' },
+      { msg: "Bro. Really?",                         emoji: '😒' },
+    ],
+    tooSmall: [
+      { msg: "I can't even read it on normal size.", emoji: '😑' },
+      { msg: "What are you doing?",                  emoji: '🤨' },
+      { msg: "How dare you…",                        emoji: '😤' },
+      { msg: "STOP BRO..",                           emoji: '😤' },
+    ],
+  },
+  'fi-ai': {
+    tooBig:   [{ msg: "Illustrator icon is not a billboard.",  emoji: '😑' }, { msg: "Way too big bro.",                 emoji: '🤨' }, { msg: "Calm down with the scaling.",      emoji: '😒' }],
+    tooSmall: [{ msg: "Can you even see that?",                emoji: '😑' }, { msg: "AI icon is not your pp bro.",      emoji: '😭' }, { msg: "Too small man.",                   emoji: '😒' }],
+  },
+  'fi-ps': {
+    tooBig:   [{ msg: "Photoshop icon is not a poster bro.",   emoji: '😑' }, { msg: "That's way too big man.",          emoji: '🤨' }, { msg: "Stop stretching my tools.",        emoji: '😒' }],
+    tooSmall: [{ msg: "PS icon is not your pp bro.",           emoji: '😭' }, { msg: "Too small, I can barely see it.", emoji: '😑' }, { msg: "Why so smoll.",                    emoji: '😒' }],
+  },
+  'fi-ae': {
+    tooBig:   [{ msg: "After Effects is not a banner.",        emoji: '😑' }, { msg: "AE icon is not that big bro.",    emoji: '🤨' }, { msg: "Way too much man.",                emoji: '😒' }],
+    tooSmall: [{ msg: "Can you even see AE anymore?",          emoji: '😑' }, { msg: "AE icon is not your pp bro.",     emoji: '😭' }, { msg: "Too small bro.",                   emoji: '😒' }],
+  },
+  'fi-figma': {
+    tooBig:   [{ msg: "Figma icon is not a billboard.",        emoji: '😑' }, { msg: "That's too big man.",             emoji: '🤨' }, { msg: "Stop it with the scaling bro.",    emoji: '😒' }],
+    tooSmall: [{ msg: "Figma icon is not your pp.",            emoji: '😭' }, { msg: "I can barely see it.",            emoji: '😑' }, { msg: "Why so tiny bro.",                 emoji: '😒' }],
+  },
+  'fi-html': {
+    tooBig:   [{ msg: "HTML5 is not a banner bro.",            emoji: '😑' }, { msg: "That's way too big.",             emoji: '🤨' }, { msg: "Calm down.",                       emoji: '😒' }],
+    tooSmall: [{ msg: "HTML5 is not your pp bro.",             emoji: '😭' }, { msg: "Too small man.",                  emoji: '😑' }, { msg: "Why are you like this.",           emoji: '😒' }],
   },
 }
 
-const ROTATE_MESSAGES: Record<string, { tilted: Msg; sideways: Msg; upsideDown: Msg }> = {
+const ROTATE_MESSAGES: Record<string, { tilted: Msg[]; sideways: Msg[]; upsideDown: Msg[] }> = {
   'el-eyebrow': {
-    tilted:     { msg: "Titles go horizontal. Always.",           emoji: '😐' },
-    sideways:   { msg: "Did you fall asleep on your keyboard?",   emoji: '😒' },
-    upsideDown: { msg: "What are you even doing.",                emoji: '🙃' },
+    tilted: [
+      { msg: "Are you sideways right now?",          emoji: '😒' },
+      { msg: "Can you even read it by doing this?",  emoji: '🙄' },
+      { msg: "What are you even doing bro?",         emoji: '😑' },
+      { msg: "Come on, really?",                     emoji: '😤' },
+    ],
+    sideways: [
+      { msg: "Are you sideways right now?",          emoji: '😒' },
+      { msg: "Can you even read it by doing this?",  emoji: '🙄' },
+      { msg: "What are you even doing bro?",         emoji: '😑' },
+      { msg: "Come on, really?",                     emoji: '😤' },
+    ],
+    upsideDown: [
+      { msg: "huh?",                                 emoji: '😶' },
+      { msg: "Are you a demogorgon?",                emoji: '😮' },
+      { msg: "Even Eleven doesn't like this.",       emoji: '😑' },
+      { msg: "Stop it!",                             emoji: '😤' },
+    ],
   },
   'el-headline': {
-    tilted:     { msg: "My name doesn't lean.",                   emoji: '🙃' },
-    sideways:   { msg: "Rotate your monitor, not my name.",       emoji: '😒' },
-    upsideDown: { msg: "I'm not Australian.",                     emoji: '🙃' },
+    tilted: [
+      { msg: "Yeah bro, no.",                        emoji: '😑' },
+      { msg: "Nope, undo!",                          emoji: '😤' },
+      { msg: "Maybe rotate your screen instead.",    emoji: '🙄' },
+      { msg: "So funny bro, I laugh.",               emoji: '😒' },
+    ],
+    sideways: [
+      { msg: "Yeah bro, no.",                        emoji: '😑' },
+      { msg: "Nope, undo!",                          emoji: '😤' },
+      { msg: "Maybe rotate your screen instead.",    emoji: '🙄' },
+      { msg: "So funny bro, I laugh.",               emoji: '😒' },
+    ],
+    upsideDown: [
+      { msg: "What? You think I'm Australian?",      emoji: '🙄' },
+      { msg: "Even Vecna hates this.",               emoji: '😤' },
+      { msg: "What, you think this is Stranger Things?", emoji: '😒' },
+      { msg: "You think you are funny huh?",         emoji: '😑' },
+    ],
   },
   'el-subtext': {
-    tilted:     { msg: "No one reads at an angle.",               emoji: '😑' },
-    sideways:   { msg: "Turn your phone back. Now.",              emoji: '😒' },
-    upsideDown: { msg: "Bro who reads upside down.",              emoji: '🙃' },
+    tilted: [
+      { msg: "I can't even read it this way.",       emoji: '😑' },
+      { msg: "What do you mean???",                  emoji: '🤨' },
+      { msg: "Aight bro, stop.",                     emoji: '😤' },
+      { msg: "Nope, undo!",                          emoji: '😒' },
+    ],
+    sideways: [
+      { msg: "I can't even read it this way.",       emoji: '😑' },
+      { msg: "What do you mean???",                  emoji: '🤨' },
+      { msg: "Aight bro, stop.",                     emoji: '😤' },
+      { msg: "Nope, undo!",                          emoji: '😒' },
+    ],
+    upsideDown: [
+      { msg: "What is this?",                        emoji: '😶' },
+      { msg: "But why?",                             emoji: '🤨' },
+      { msg: "Are you Australian?",                  emoji: '🙄' },
+      { msg: "People from Sydney approve this, but I don't.", emoji: '😒' },
+    ],
   },
   'el-hint': {
-    tilted:     { msg: "HOW DARE YOU TILT IT",                    emoji: '😤' },
-    sideways:   { msg: "HOW DARE YOU TURN IT SIDEWAYS",           emoji: '😤' },
-    upsideDown: { msg: "HOW DARE YOU FLIP IT UPSIDE DOWN",        emoji: '😤' },
+    tilted: [
+      { msg: "How dare you…",                        emoji: '😤' },
+      { msg: "Really bro…",                          emoji: '😑' },
+      { msg: "Aight, what the flip.",                emoji: '😒' },
+      { msg: "You are so funny…",                    emoji: '🙄' },
+    ],
+    sideways: [
+      { msg: "How dare you…",                        emoji: '😤' },
+      { msg: "Really bro…",                          emoji: '😑' },
+      { msg: "Aight, what the flip.",                emoji: '😒' },
+      { msg: "You are so funny…",                    emoji: '🙄' },
+    ],
+    upsideDown: [
+      { msg: "You are really something.",            emoji: '😒' },
+      { msg: "How dare you…",                        emoji: '😤' },
+      { msg: "Really?",                              emoji: '🙄' },
+      { msg: "Nope, nope, nope.",                    emoji: '😑' },
+    ],
+  },
+  'fi-ai': {
+    tilted:     [{ msg: "Illustrator doesn't lean bro.",       emoji: '😑' }, { msg: "Rotate your head not my tools.", emoji: '😒' }, { msg: "Come on bro.",                     emoji: '😤' }],
+    sideways:   [{ msg: "Why is Illustrator sideways.",        emoji: '🤨' }, { msg: "Rotate your screen not my icon.",emoji: '😒' }, { msg: "Bro, seriously.",                  emoji: '😑' }],
+    upsideDown: [{ msg: "Even Adobe didn't expect this.",      emoji: '😮' }, { msg: "Upside down Illustrator, really?",emoji: '🙄' }, { msg: "What is wrong with you bro.",      emoji: '😒' }],
+  },
+  'fi-ps': {
+    tilted:     [{ msg: "Photoshop doesn't tilt bro.",         emoji: '😑' }, { msg: "Stop tilting my tools.",         emoji: '😒' }, { msg: "Come on man.",                     emoji: '😤' }],
+    sideways:   [{ msg: "Why is Photoshop sideways.",          emoji: '🤨' }, { msg: "PS goes horizontal bro.",        emoji: '😒' }, { msg: "Aight bro, no.",                   emoji: '😑' }],
+    upsideDown: [{ msg: "Upside down Photoshop. Really.",      emoji: '🙄' }, { msg: "Adobe is crying right now.",     emoji: '😒' }, { msg: "Why bro, just why.",               emoji: '🤨' }],
+  },
+  'fi-ae': {
+    tilted:     [{ msg: "After Effects doesn't lean.",         emoji: '😑' }, { msg: "Stop tilting AE bro.",           emoji: '😒' }, { msg: "Really man.",                      emoji: '😤' }],
+    sideways:   [{ msg: "AE sideways? Come on.",               emoji: '🤨' }, { msg: "That's not how motion works bro.",emoji: '😒' }, { msg: "Nope, undo.",                      emoji: '😑' }],
+    upsideDown: [{ msg: "AE upside down. You wild.",           emoji: '🙄' }, { msg: "Adobe After Effects is crying.", emoji: '😒' }, { msg: "What are you doing bro.",          emoji: '🤨' }],
+  },
+  'fi-figma': {
+    tilted:     [{ msg: "Figma doesn't tilt bro.",             emoji: '😑' }, { msg: "Stop tilting my design tool.",   emoji: '😒' }, { msg: "Come on man.",                     emoji: '😤' }],
+    sideways:   [{ msg: "Figma sideways? Really bro.",         emoji: '🤨' }, { msg: "Design tools go horizontal.",    emoji: '😒' }, { msg: "Nope.",                            emoji: '😑' }],
+    upsideDown: [{ msg: "Figma upside down. You good?",        emoji: '🙄' }, { msg: "Even designers hate you now.",   emoji: '😒' }, { msg: "Why would you do this.",           emoji: '🤨' }],
+  },
+  'fi-html': {
+    tilted:     [{ msg: "HTML5 doesn't lean bro.",             emoji: '😑' }, { msg: "Stop tilting my tools.",         emoji: '😒' }, { msg: "Aight man, no.",                   emoji: '😤' }],
+    sideways:   [{ msg: "HTML5 sideways. Classic.",            emoji: '🤨' }, { msg: "The internet is crying bro.",    emoji: '😒' }, { msg: "Nope, undo.",                      emoji: '😑' }],
+    upsideDown: [{ msg: "HTML upside down. You wild bro.",     emoji: '🙄' }, { msg: "Tim Berners-Lee is crying.",     emoji: '😒' }, { msg: "What is wrong with you.",          emoji: '🤨' }],
   },
 }
 
 function getScaleMsg(id: string, scale: number): Msg {
   const entry = SCALE_MESSAGES[id]
   if (!entry) return { msg: "Please don't do that.", emoji: '😐' }
-  return scale > 1 ? entry.tooBig : entry.tooSmall
+  const pool = scale > 1 ? entry.tooBig : entry.tooSmall
+  return pick(pool)
 }
 
 function getRotateMsg(id: string, rotation: number): Msg {
   const entry = ROTATE_MESSAGES[id]
   if (!entry) return { msg: "Please don't do that.", emoji: '😐' }
   const norm = ((rotation % 360) + 360) % 360
-  if (norm >= 150 && norm <= 210) return entry.upsideDown
-  if ((norm >= 60 && norm <= 120) || (norm >= 240 && norm <= 300)) return entry.sideways
-  return entry.tilted
+  if (norm >= 150 && norm <= 210) return pick(entry.upsideDown)
+  if ((norm >= 60 && norm <= 120) || (norm >= 240 && norm <= 300)) return pick(entry.sideways)
+  return pick(entry.tilted)
+}
+
+function getDragMsg(id: string): Msg {
+  const pool = DRAG_MESSAGES[id]
+  if (!pool) return { msg: "Please don't do that.", emoji: '😐' }
+  return pick(pool)
 }
 
 function runSpring(
@@ -154,7 +335,7 @@ export default function Hero() {
       selectionStore.set(null)
       el.classList.add('correcting')
 
-      const cfg  = DRAG_MESSAGES[el.id] || { msg: "Please don't do that.", emoji: '😐' }
+      const cfg  = getDragMsg(el.id)
       const orig = origPos.current[el.id]
       const hr   = hero.getBoundingClientRect()
       const cur  = cursorRef.current!
