@@ -28,20 +28,21 @@ function animateTo(
 }
 
 export default function WelcomeScreen() {
-  const screenRef  = useRef<HTMLDivElement>(null)
-  const cursorRef  = useRef<HTMLDivElement>(null)
-  const pulseRef   = useRef<HTMLParagraphElement>(null)
+  const screenRef = useRef<HTMLDivElement>(null)
+  const cursorRef = useRef<HTMLDivElement>(null)
+  const pulseRef  = useRef<HTMLParagraphElement>(null)
   const [gone,    setGone]    = useState(false)
   const [clicked, setClicked] = useState(false)
 
-  // Switch pulse text to looping pulse animation after fade-in completes
+  // Fix #2: clear the forwards-fill transform before switching to pulse animation
   useEffect(() => {
     const t = setTimeout(() => {
       if (pulseRef.current) {
+        pulseRef.current.style.transform = 'translateY(0)'
         pulseRef.current.style.animation = 'ws-pulse 2s ease-in-out infinite'
         pulseRef.current.style.opacity   = '1'
       }
-    }, 1800 + 500 + 50) // fade-in delay + duration + buffer
+    }, 1800 + 500 + 50)
     return () => clearTimeout(t)
   }, [])
 
@@ -57,7 +58,8 @@ export default function WelcomeScreen() {
     const cy     = window.innerHeight / 2
     const startY = window.innerHeight + 40
 
-    // Place cursor off-screen bottom
+    // Fix #1: cursor is now a sibling (outside the screen div), so position: fixed
+    // is relative to the viewport, not the transformed parent.
     cursor.style.left    = cx + 'px'
     cursor.style.top     = startY + 'px'
     cursor.style.opacity = '1'
@@ -83,45 +85,78 @@ export default function WelcomeScreen() {
   if (gone) return null
 
   return (
-    <div
-      ref={screenRef}
-      onClick={startExit}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 99999,
-        backgroundColor: '#011910',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        cursor: 'default', userSelect: 'none',
-      }}
-    >
-      {/* Logo */}
-      <div className="ws-logo" style={{ marginBottom: 32 }}>
-        <Image src="/logo-green.png" alt="Rafi" width={52} height={52} style={{ objectFit: 'contain' }} priority />
+    <>
+      {/* Welcome screen */}
+      <div
+        ref={screenRef}
+        onClick={startExit}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 99999,
+          backgroundColor: '#011910',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          cursor: 'default', userSelect: 'none',
+        }}
+      >
+        {/* Logo */}
+        <div className="ws-logo" style={{ marginBottom: 32 }}>
+          <Image src="/logo-green.png" alt="Rafi" width={52} height={52} style={{ objectFit: 'contain' }} priority />
+        </div>
+
+        {/* Hello */}
+        <p className="ws-hello" style={{
+          fontSize: 'clamp(12px, 1.8vw, 15px)', fontWeight: 600,
+          color: 'rgba(255,255,255,0.5)', letterSpacing: '0.18em',
+          textTransform: 'uppercase', marginBottom: 10,
+        }}>Hello</p>
+
+        {/* Welcome to my portfolio */}
+        <h1 className="ws-title" style={{
+          fontSize: 'clamp(26px, 5vw, 52px)', fontWeight: 700,
+          color: '#ffffff', letterSpacing: '-0.03em',
+          lineHeight: 1.1, textAlign: 'center',
+          marginBottom: 52,
+        }}>Welcome to my portfolio</h1>
+
+        {/* Pulsing CTA */}
+        <p ref={pulseRef} className="ws-pulse" style={{
+          fontSize: 'clamp(10px, 1.3vw, 12px)', fontWeight: 500,
+          letterSpacing: '0.2em', textTransform: 'uppercase',
+          color: 'rgba(255,255,255,1)',
+        }}>Click anywhere to see my masterpiece</p>
+
+        <style>{`
+          .ws-logo {
+            opacity: 0;
+            transform: translateY(8px);
+            animation: ws-in 0.5s ease-out 0.3s forwards;
+          }
+          .ws-hello {
+            opacity: 0;
+            transform: translateY(8px);
+            animation: ws-in 0.5s ease-out 0.8s forwards;
+          }
+          .ws-title {
+            opacity: 0;
+            transform: translateY(8px);
+            animation: ws-in 0.5s ease-out 1.2s forwards;
+          }
+          .ws-pulse {
+            opacity: 0;
+            transform: translateY(8px);
+            animation: ws-in 0.5s ease-out 1.8s forwards;
+          }
+          @keyframes ws-in {
+            to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes ws-pulse {
+            0%, 100% { opacity: 0.2; }
+            50%       { opacity: 1; }
+          }
+        `}</style>
       </div>
 
-      {/* Hello */}
-      <p className="ws-hello" style={{
-        fontSize: 'clamp(12px, 1.8vw, 15px)', fontWeight: 600,
-        color: 'rgba(255,255,255,0.5)', letterSpacing: '0.18em',
-        textTransform: 'uppercase', marginBottom: 10,
-      }}>Hello</p>
-
-      {/* Welcome to my portfolio */}
-      <h1 className="ws-title" style={{
-        fontSize: 'clamp(26px, 5vw, 52px)', fontWeight: 700,
-        color: '#ffffff', letterSpacing: '-0.03em',
-        lineHeight: 1.1, textAlign: 'center',
-        marginBottom: 52,
-      }}>Welcome to my portfolio</h1>
-
-      {/* Pulsing CTA */}
-      <p ref={pulseRef} className="ws-pulse" style={{
-        fontSize: 'clamp(10px, 1.3vw, 12px)', fontWeight: 500,
-        letterSpacing: '0.2em', textTransform: 'uppercase',
-        color: 'rgba(255,255,255,1)',
-      }}>Click anywhere to see my masterpiece</p>
-
-      {/* Rafi cursor */}
+      {/* Rafi cursor — OUTSIDE the screen div so position:fixed stays viewport-relative */}
       <div
         ref={cursorRef}
         style={{
@@ -140,36 +175,6 @@ export default function WelcomeScreen() {
           boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
         }}>Rafi · dragging...</div>
       </div>
-
-      <style>{`
-        .ws-logo {
-          opacity: 0;
-          transform: translateY(8px);
-          animation: ws-in 0.5s ease-out 0.3s forwards;
-        }
-        .ws-hello {
-          opacity: 0;
-          transform: translateY(8px);
-          animation: ws-in 0.5s ease-out 0.8s forwards;
-        }
-        .ws-title {
-          opacity: 0;
-          transform: translateY(8px);
-          animation: ws-in 0.5s ease-out 1.2s forwards;
-        }
-        .ws-pulse {
-          opacity: 0;
-          transform: translateY(8px);
-          animation: ws-in 0.5s ease-out 1.8s forwards;
-        }
-        @keyframes ws-in {
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes ws-pulse {
-          0%, 100% { opacity: 0.2; }
-          50%       { opacity: 1; }
-        }
-      `}</style>
-    </div>
+    </>
   )
 }
