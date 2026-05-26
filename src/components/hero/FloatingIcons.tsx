@@ -12,7 +12,7 @@ const ICONS = [
   {
     id: 'fi-ai',
     label: 'Illustrator',
-    src: '/icon-ai.png',
+    src: '/icon-ai.svg',
     lx: '21%',  ly: '30%',
     mx: '12%',  my: '7%',
     dur: 6.2,   delay: 0,
@@ -21,7 +21,7 @@ const ICONS = [
   {
     id: 'fi-ps',
     label: 'Photoshop',
-    src: '/icon-ps.png',
+    src: '/icon-ps.svg',
     lx: '25%',  ly: '65%',
     mx: '47%',  my: '5%',
     dur: 5.8,   delay: 1.1,
@@ -30,7 +30,7 @@ const ICONS = [
   {
     id: 'fi-ae',
     label: 'After Effects',
-    src: '/icon-ae.png',
+    src: '/icon-ae.svg',
     lx: '79%',  ly: '26%',
     mx: '80%',  my: '7%',
     dur: 7.1,   delay: 0.5,
@@ -39,7 +39,7 @@ const ICONS = [
   {
     id: 'fi-figma',
     label: 'Figma',
-    src: '/icon-figma.png',
+    src: '/icon-figma.svg',
     lx: '79%',  ly: '60%',
     mx: '25%',  my: '87%',
     dur: 6.5,   delay: 2.0,
@@ -48,7 +48,7 @@ const ICONS = [
   {
     id: 'fi-html',
     label: 'HTML5',
-    src: '/icon-html5.png',
+    src: '/icon-html5.svg',
     lx: '67%',  ly: '74%',
     mx: '68%',  my: '85%',
     dur: 5.4,   delay: 1.6,
