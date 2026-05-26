@@ -24,7 +24,7 @@ const SCALE_MESSAGES: Record<string, { tooBig: Msg; tooSmall: Msg }> = {
   },
   'el-subtext': {
     tooBig:   { msg: "Nobody reads at that size.",       emoji: '🫠' },
-    tooSmall: { msg: "Even ants can't read that.",       emoji: '😑' },
+    tooSmall: { msg: "This isn't a poster for ants.",    emoji: '😑' },
   },
 }
 
@@ -42,7 +42,7 @@ const ROTATE_MESSAGES: Record<string, { tilted: Msg; sideways: Msg; upsideDown: 
   'el-subtext': {
     tilted:     { msg: "No one reads at an angle.",               emoji: '😑' },
     sideways:   { msg: "Turn your phone back. Now.",              emoji: '😒' },
-    upsideDown: { msg: "This isn't a poster for ants.",           emoji: '🙃' },
+    upsideDown: { msg: "Bro who reads upside down.",               emoji: '🙃' },
   },
 }
 
