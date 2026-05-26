@@ -11,6 +11,30 @@ const ROT_OFFSET = 32   // px above selection top
 
 const CORNER_CURSORS = ['nwse-resize', 'nesw-resize', 'nesw-resize', 'nwse-resize']
 
+const ELEMENT_NAMES: Record<string, { label: string; type: 'text' | 'button' }> = {
+  'el-eyebrow':  { label: 'overthinker_text',  type: 'text'   },
+  'el-headline': { label: 'bigBossHeadline',   type: 'text'   },
+  'el-subtext':  { label: 'supportingActor',   type: 'text'   },
+  'el-cta':      { label: 'pleaseClickMe_btn', type: 'button' },
+  'el-hint':     { label: 'uselessHint',       type: 'text'   },
+  'el-404':      { label: 'whoops_404',        type: 'text'   },
+  'el-sub':      { label: 'sadLittleMessage',  type: 'text'   },
+  'el-btn':      { label: 'escapeHatch_cta',   type: 'button' },
+}
+
+const TextIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 11 11" fill="currentColor" style={{ flexShrink: 0 }}>
+    <rect x="0.5" y="0.5" width="10" height="2" rx="0.5"/>
+    <rect x="4.5" y="0.5" width="2" height="10" rx="0.5"/>
+  </svg>
+)
+
+const ButtonIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ flexShrink: 0 }}>
+    <rect x="0.75" y="3" width="9.5" height="5" rx="2"/>
+  </svg>
+)
+
 export default function SelectionOverlay() {
   const [sel, setSel] = useState<SelectionBounds>(null)
   const selRef  = useRef<SelectionBounds>(null)
@@ -136,6 +160,28 @@ export default function SelectionOverlay() {
 
       {/* Selection border */}
       <div style={{ position:'absolute', left:x, top:y, width:w, height:h, outline:`1.5px solid ${GREEN}`, outlineOffset:0 }} />
+
+      {/* Element name label — top-left of selection */}
+      {sel?.id && ELEMENT_NAMES[sel.id] && (() => {
+        const { label, type } = ELEMENT_NAMES[sel.id]
+        return (
+          <div style={{
+            position: 'absolute',
+            left: x,
+            top: y - 22,
+            background: GREEN,
+            color: '#000',
+            fontSize: 11, fontWeight: 600,
+            padding: '2px 7px', borderRadius: 3,
+            whiteSpace: 'nowrap', letterSpacing: '0.01em',
+            fontFamily: 'inherit',
+            display: 'flex', alignItems: 'center', gap: 5,
+          }}>
+            {type === 'text' ? <TextIcon /> : <ButtonIcon />}
+            {label}
+          </div>
+        )
+      })()}
 
       {/* Rotation line */}
       <div style={{
