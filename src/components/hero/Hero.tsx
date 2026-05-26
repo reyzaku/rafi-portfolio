@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { selectionStore } from '@/lib/selection-store'
 import { transformStore, correctionBus, CorrectionReason } from '@/lib/transform-store'
 import FloatingIcons from './FloatingIcons'
+import { HandRaisedIcon } from '@heroicons/react/24/solid'
 
 type Msg = { msg: string; emoji: string }
 
@@ -471,6 +472,7 @@ export default function Hero() {
           color: 'rgba(255,255,255,0.55)', zIndex: 10, pointerEvents: 'none',
           whiteSpace: 'nowrap', animation: 'hpulse 3s ease-in-out infinite',
         }}>
+          <HandRaisedIcon style={{ width: 11, height: 11, display: 'inline', verticalAlign: 'middle', marginRight: 6 }} />
           drag anything &nbsp;·&nbsp; i dare you
         </div>
 
