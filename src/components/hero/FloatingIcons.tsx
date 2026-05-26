@@ -67,7 +67,31 @@ export default function FloatingIcons() {
       el: HTMLElement
       startElX: number; startElY: number
       startMX: number;  startMY: number
+      wasDragged: boolean
     } | null = null
+
+    // Persistent selected icon id
+    const selectedId = { current: '' }
+
+    function selectIcon(el: HTMLElement) {
+      selectedId.current = el.id
+      el.style.animationPlayState = 'paused'
+      el.classList.add('fi-selected')
+      const r = el.getBoundingClientRect()
+      selectionStore.set({ x: r.left, y: r.top, w: r.width, h: r.height, id: el.id })
+    }
+
+    function deselectAll() {
+      if (!selectedId.current) return
+      const c = containerRef.current
+      const old = c?.querySelector<HTMLElement>(`#${selectedId.current}`)
+      if (old) {
+        old.classList.remove('fi-selected')
+        old.style.animationPlayState = 'running'
+      }
+      selectedId.current = ''
+      selectionStore.set(null)
+    }
 
     function onDown(e: MouseEvent | TouchEvent) {
       const target = (e.target as HTMLElement).closest<HTMLElement>('.floating-icon')
@@ -77,14 +101,21 @@ export default function FloatingIcons() {
       const pt = 'touches' in e ? e.touches[0] : e
       const elLeft = parseFloat(target.style.left)
       const elTop  = parseFloat(target.style.top)
-
-      // Only valid if already positioned in px (after initPos)
       if (isNaN(elLeft)) return
+
+      // If a different icon is already selected, deselect it first
+      if (selectedId.current && selectedId.current !== target.id) {
+        const c = containerRef.current
+        const old = c?.querySelector<HTMLElement>(`#${selectedId.current}`)
+        if (old) { old.classList.remove('fi-selected'); old.style.animationPlayState = 'running' }
+        selectedId.current = ''
+      }
 
       active = {
         el: target,
         startElX: elLeft, startElY: elTop,
         startMX: pt.clientX, startMY: pt.clientY,
+        wasDragged: false,
       }
 
       target.style.animationPlayState = 'paused'
@@ -99,6 +130,7 @@ export default function FloatingIcons() {
       const pt = 'touches' in e ? e.touches[0] : e
       const dx = pt.clientX - active.startMX
       const dy = pt.clientY - active.startMY
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) active.wasDragged = true
       active.el.style.left = (active.startElX + dx) + 'px'
       active.el.style.top  = (active.startElY + dy) + 'px'
       const r = active.el.getBoundingClientRect()
@@ -107,12 +139,31 @@ export default function FloatingIcons() {
 
     function onUp() {
       if (!active) return
-      active.el.style.animationPlayState = 'running'
-      active.el.style.zIndex = ''
-      active.el.classList.remove('fi-grabbed')
-      selectionStore.set(null)
+      const el = active.el
+      const dragged = active.wasDragged
+      el.classList.remove('fi-grabbed')
+      el.style.zIndex = ''
       active = null
+
+      if (!dragged) {
+        // Pure click: toggle selected state
+        if (selectedId.current === el.id) {
+          deselectAll()
+        } else {
+          selectIcon(el)
+        }
+      } else {
+        // After drag: keep it selected in place
+        selectIcon(el)
+      }
     }
+
+    // Click outside any icon → deselect
+    function onWindowDown(e: MouseEvent | TouchEvent) {
+      if (!(e.target as HTMLElement).closest('.floating-icon')) deselectAll()
+    }
+    window.addEventListener('mousedown',  onWindowDown)
+    window.addEventListener('touchstart', onWindowDown)
 
     // Convert % → px for all icons so drag math works
     function initPositions() {
@@ -143,11 +194,13 @@ export default function FloatingIcons() {
     container.addEventListener('touchstart', onDown, { passive: false })
 
     return () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mouseup',   onUp)
-      window.removeEventListener('touchmove', onMove)
-      window.removeEventListener('touchend',  onUp)
-      window.removeEventListener('resize',    initPositions)
+      window.removeEventListener('mousemove',  onMove)
+      window.removeEventListener('mouseup',    onUp)
+      window.removeEventListener('touchmove',  onMove)
+      window.removeEventListener('touchend',   onUp)
+      window.removeEventListener('mousedown',  onWindowDown)
+      window.removeEventListener('touchstart', onWindowDown)
+      window.removeEventListener('resize',     initPositions)
     }
   }, [])
 
@@ -207,12 +260,18 @@ export default function FloatingIcons() {
 
       <style>{`
         .floating-icon:hover .fi-tooltip,
-        .fi-grabbed .fi-tooltip { opacity: 1 !important; }
+        .fi-grabbed .fi-tooltip,
+        .fi-selected .fi-tooltip { opacity: 1 !important; }
 
         .fi-grabbed {
           cursor: grabbing !important;
           box-shadow: 0 16px 40px rgba(0,0,0,0.45) !important;
           border-color: rgba(255,255,255,0.18) !important;
+        }
+
+        .fi-selected {
+          border-color: rgba(92,255,133,0.5) !important;
+          box-shadow: 0 0 0 1px rgba(92,255,133,0.25), 0 8px 24px rgba(0,0,0,0.3) !important;
         }
 
         ${ICONS.map(({ id, kf }) => `
