@@ -413,6 +413,7 @@ export default function Hero() {
       isCorrecting.current = true
       selectionStore.set(null)
       el.classList.add('correcting')
+      window.dispatchEvent(new CustomEvent('rafi-correct'))
 
       const cfg  = getDragMsg(el.id)
       const orig = origPos.current[el.id]

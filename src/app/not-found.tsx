@@ -4,10 +4,30 @@ import { useEffect, useRef } from 'react'
 import Nav from '@/components/layout/Nav'
 import Link from 'next/link'
 
-const FLEE_LABELS     = ['Rafi · nope!', 'Rafi · bye!', 'Rafi · not today', 'Rafi · leave me alone']
-const IDLE_LABELS     = ['Rafi · chilling...', 'Rafi · hmm...', 'Rafi · vibing', 'Rafi · ...']
-const RECOVERY_LABELS = ['Rafi · phew...', 'Rafi · that was close', 'Rafi · ok ok...', 'Rafi · 😮‍💨']
-const WANDER_LABELS   = ['Rafi · exploring...', 'Rafi · where am i', 'Rafi · just wandering']
+const FLEE_LABELS     = [
+  'Rafi · nope!', 'Rafi · bye!', 'Rafi · not today', 'Rafi · leave me alone',
+  'Rafi · NOPE NOPE NOPE', 'Rafi · i dont know you', 'Rafi · stranger danger',
+  'Rafi · im busy rn', 'Rafi · please no', 'Rafi · ✌️ peace out',
+  'Rafi · i have a meeting', 'Rafi · aaaaaa', 'Rafi · why are you like this',
+]
+const IDLE_LABELS     = [
+  'Rafi · chilling...', 'Rafi · hmm...', 'Rafi · vibing', 'Rafi · ...',
+  'Rafi · la la la', 'Rafi · thinking...', 'Rafi · zoning out',
+  'Rafi · just existing', 'Rafi · bored ngl', 'Rafi · *stares into void*',
+  'Rafi · waiting for wifi', 'Rafi · do i know you?', 'Rafi · 🫠',
+]
+const RECOVERY_LABELS = [
+  'Rafi · phew...', 'Rafi · that was close', 'Rafi · ok ok...', 'Rafi · 😮‍💨',
+  'Rafi · my heart...', 'Rafi · i need a moment', 'Rafi · never again',
+  'Rafi · ok im fine', 'Rafi · that person is crazy', 'Rafi · note to self: run faster',
+  'Rafi · *deep breath*', 'Rafi · where did they go', 'Rafi · still shaking ngl',
+]
+const WANDER_LABELS   = [
+  'Rafi · exploring...', 'Rafi · where am i', 'Rafi · just wandering',
+  'Rafi · taking a walk', 'Rafi · no destination', 'Rafi · aimless as always',
+  'Rafi · looking for something', 'Rafi · this way maybe?', 'Rafi · hm this looks nice',
+  'Rafi · i live here now', 'Rafi · not all who wander are lost', 'Rafi · ok maybe i am lost',
+]
 
 function pick(arr: string[]) { return arr[Math.floor(Math.random() * arr.length)] }
 
@@ -86,6 +106,7 @@ export default function NotFound() {
     function startRecovery() {
       state = 'idle'
       lbl.textContent = pick(RECOVERY_LABELS)
+      window.dispatchEvent(new CustomEvent('rafi-recover'))
       idleTimer = window.setTimeout(startWander, 1500 + Math.random() * 1500)
     }
 
@@ -94,6 +115,7 @@ export default function NotFound() {
       state = 'flee'
       canDetect = false
       lbl.textContent = pick(FLEE_LABELS)
+      window.dispatchEvent(new CustomEvent('rafi-flee'))
       const t = safeFlee()
       targetX = t.x
       targetY = t.y
