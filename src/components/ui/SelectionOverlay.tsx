@@ -97,6 +97,7 @@ export default function SelectionOverlay() {
   const onCornerDown = (i: number) => (e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
+    window.dispatchEvent(new CustomEvent('element-scale'))
     const dist = Math.hypot(e.clientX - center.x, e.clientY - center.y)
     const t = transformStore.get(sel.id)
     dragRef.current = {
@@ -112,6 +113,7 @@ export default function SelectionOverlay() {
   const onRotateDown = (e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
+    window.dispatchEvent(new CustomEvent('element-rotate'))
     const angle = Math.atan2(e.clientY - center.y, e.clientX - center.x)
     const t = transformStore.get(sel.id)
     dragRef.current = {

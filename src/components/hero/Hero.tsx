@@ -508,6 +508,7 @@ export default function Hero() {
       isCorrecting.current = true
       selectionStore.set(null)
       el.classList.add('correcting')
+      window.dispatchEvent(new CustomEvent('rafi-correct'))
 
       const { scale, rotation } = transformStore.get(el.id)
       const cfg = reason === 'scale'
@@ -630,6 +631,7 @@ export default function Hero() {
         activeDrag.current = el
         dragMoved.current  = false
         el.classList.add('is-grabbed')
+        window.dispatchEvent(new CustomEvent('element-drag'))
         const r = el.getBoundingClientRect()
         dOff.current = { x: (e as MouseEvent).clientX - r.left, y: (e as MouseEvent).clientY - r.top }
 

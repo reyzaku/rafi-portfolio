@@ -5,10 +5,11 @@ import { useEffect, useRef, useState } from 'react'
 const LABELS = {
   move:     ['weeeeee', 'zoom zoom', 'vroom vroom', 'woooosh', 'look at me go', 'going places', 'on the move', 'gliding...', 'speedy', 'wheeeee', 'zoom~'],
   idle:     ['zoning out', 'lost tbh', 'just existing', 'thinking...', 'blank stare', 'idk anymore', 'hmm', 'figuring things out'],
-  hover:    ['curious', 'tempted', 'maybe...', 'interested', 'ooh', 'should i?', 'do i dare', 'tell me more'],
-  click:    ['let\'s go', 'aight', 'on it', 'done', 'ok ok', 'yep'],
+  sleep:    ['*zzz*', '*snore*', '💤', 'out cold', 'sleeping fr', 'gone', '*zzzzz*', 'do not disturb'],
   misclick: ['why did i click that', 'nothing here', 'clicking the void', 'that did nothing', '...ok', 'oops', 'just checking'],
-  scroll:   ['exploring', 'looking for something', 'what\'s down here', 'keep going'],
+  drag:     ['moving things...', 'rearranging', 'this goes here', 'lemme fix this', 'drag drag drag', 'interior design mode'],
+  scale:    ['making it bigger', 'size check', 'scaling...', 'bigger? smaller?', 'resize time'],
+  rotate:   ['spinning...', 'dizzy yet?', 'rotate rotate', 'round and round', 'wheeling it'],
   flee:     ['come back!', 'wait wait', 'i don\'t bite', 'why run', 'just saying hi', 'hey!!'],
   recover:  ['i did nothing', 'ok my bad', 'sorry lol', 'i\'ll behave'],
   correct:  ['ok my bad', 'sorry sorry', 'i was playing', 'i\'ll put it back', 'ok i get it', 'rafi pls'],
@@ -24,11 +25,12 @@ export default function CustomCursor() {
   const raf         = useRef<number>(0)
   const revertTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const idleTimer   = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const moveTimer   = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const isMoving    = useRef(false)
-  const isHovering  = useRef(false)
+  const sleepTimer  = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isClicking  = useRef(false)
+  const isSleeping  = useRef(false)
+  const isMoving    = useRef(false)
+  const moveTimer   = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const stillPos    = useRef({ x: -100, y: -100 })
 
   useEffect(() => {
     const lbl = labelRef.current!
@@ -37,13 +39,19 @@ export default function CustomCursor() {
       if (lbl) lbl.textContent = text
     }
 
-    // Single source of truth for going idle — cancels ALL competing timers first
     function goIdle() {
-      if (isClicking.current) return  // don't interrupt a held click
+      if (isClicking.current) return
       if (revertTimer.current) { clearTimeout(revertTimer.current); revertTimer.current = null }
-      if (scrollTimer.current) { clearTimeout(scrollTimer.current); scrollTimer.current = null }
+      isMoving.current = false
+      stillPos.current = { ...pos.current }
       setLabel(pick(LABELS.idle))
-      // Schedule next idle refresh
+      if (sleepTimer.current) clearTimeout(sleepTimer.current)
+      sleepTimer.current = setTimeout(() => {
+        if (idleTimer.current) { clearTimeout(idleTimer.current); idleTimer.current = null }
+        isSleeping.current = true
+        setLabel(pick(LABELS.sleep))
+        window.dispatchEvent(new CustomEvent('user-idle'))
+      }, 3000)
       if (idleTimer.current) clearTimeout(idleTimer.current)
       idleTimer.current = setTimeout(goIdle, 5000)
     }
@@ -53,86 +61,79 @@ export default function CustomCursor() {
       revertTimer.current = setTimeout(() => { revertTimer.current = null; goIdle() }, ms)
     }
 
-    // Movement
     const onMove = (e: MouseEvent) => {
       pos.current = { x: e.clientX, y: e.clientY }
       if (!visible) setVisible(true)
-
-      // Cancel idle refresh while user is active
-      if (idleTimer.current) { clearTimeout(idleTimer.current); idleTimer.current = null }
-
-      // Transition from still → moving
-      if (!isMoving.current && !isHovering.current) {
-        isMoving.current = true
-        if (revertTimer.current) { clearTimeout(revertTimer.current); revertTimer.current = null }
-        setLabel(pick(LABELS.move))
+      if (idleTimer.current)  { clearTimeout(idleTimer.current);  idleTimer.current  = null }
+      if (sleepTimer.current) { clearTimeout(sleepTimer.current); sleepTimer.current = null }
+      if (isSleeping.current) {
+        isSleeping.current = false
+        isMoving.current = false
+        window.dispatchEvent(new CustomEvent('user-active'))
       }
-
-      // Debounce stop
+      // Only trigger move label after moving 20px+ from where cursor went still
+      if (!isClicking.current && !isMoving.current) {
+        const dx = e.clientX - stillPos.current.x
+        const dy = e.clientY - stillPos.current.y
+        if (dx * dx + dy * dy > 400) {
+          isMoving.current = true
+          setLabel(pick(LABELS.move))
+        }
+      }
+      // Short debounce — revert to idle 350ms after movement stops
       if (moveTimer.current) clearTimeout(moveTimer.current)
       moveTimer.current = setTimeout(() => {
         isMoving.current = false
-        if (!isHovering.current) goIdle()
+        stillPos.current = { ...pos.current }
+        if (!isClicking.current) goIdle()
       }, 350)
+      // Restart idle countdown on every move
+      idleTimer.current = setTimeout(goIdle, 3000)
     }
 
-    // Hover
-    const onOver = (e: MouseEvent) => {
-      const t = e.target as HTMLElement
-      if (t.closest('a, button, [role="button"], [data-cursor]')) {
-        isHovering.current = true
-        if (revertTimer.current) { clearTimeout(revertTimer.current); revertTimer.current = null }
-        setLabel(pick(LABELS.hover))
-      }
-    }
-    const onOut = (e: MouseEvent) => {
-      const t = e.target as HTMLElement
-      if (t.closest('a, button, [role="button"], [data-cursor]')) {
-        isHovering.current = false
-        revertToIdle(600)
-      }
-    }
-
-    // Click
     const onDown = (e: MouseEvent) => {
+      if (isClicking.current) return
       isClicking.current = true
       const t = e.target as HTMLElement
-      const isInteractive = !!t.closest('a, button, [role="button"], [data-cursor]')
-      if (revertTimer.current) { clearTimeout(revertTimer.current); revertTimer.current = null }
-      if (moveTimer.current)   { clearTimeout(moveTimer.current);   moveTimer.current   = null }
-      setLabel(pick(isInteractive ? LABELS.click : LABELS.misclick))
+      if (!t.closest('a, button, [role="button"], [data-cursor]')) {
+        if (revertTimer.current) { clearTimeout(revertTimer.current); revertTimer.current = null }
+        setLabel(pick(LABELS.misclick))
+      }
     }
-    const onUp = () => { isClicking.current = false; revertToIdle(800) }
+    const onUp = () => { isClicking.current = false; revertToIdle(600) }
 
-    // Scroll
-    const onScroll = () => {
-      if (revertTimer.current) { clearTimeout(revertTimer.current); revertTimer.current = null }
-      setLabel(pick(LABELS.scroll))
-      if (scrollTimer.current) clearTimeout(scrollTimer.current)
-      scrollTimer.current = setTimeout(() => { scrollTimer.current = null; goIdle() }, 1200)
+    // Hero interaction reactions
+    const onDrag    = () => { isClicking.current = true;  setLabel(pick(LABELS.drag)) }
+    const onScale   = () => { isClicking.current = true;  setLabel(pick(LABELS.scale)) }
+    const onRotate  = () => { isClicking.current = true;  setLabel(pick(LABELS.rotate)) }
+
+    // Rafi reactions — cancel moveTimer so it can't override the label
+    const clearMove = () => {
+      if (moveTimer.current) { clearTimeout(moveTimer.current); moveTimer.current = null }
+      isMoving.current = false
+      stillPos.current = { ...pos.current }
     }
-
-    // Rafi reactions
-    const onRafiFlee    = () => { setLabel(pick(LABELS.flee));    revertToIdle(2200) }
-    const onRafiRecover = () => { setLabel(pick(LABELS.recover)); revertToIdle(2800) }
-    const onRafiCorrect = () => { setLabel(pick(LABELS.correct)); revertToIdle(2800) }
+    const onRafiFlee    = () => { clearMove(); setLabel(pick(LABELS.flee));    revertToIdle(2200) }
+    const onRafiRecover = () => { clearMove(); setLabel(pick(LABELS.recover)); revertToIdle(2800) }
+    const onRafiCorrect = () => { clearMove(); setLabel(pick(LABELS.correct)); revertToIdle(2800) }
 
     const onLeave = () => setVisible(false)
     const onEnter = () => setVisible(true)
 
     document.addEventListener('mousemove',  onMove)
-    document.addEventListener('mouseover',  onOver)
-    document.addEventListener('mouseout',   onOut)
     document.addEventListener('mousedown',  onDown)
     document.addEventListener('mouseup',    onUp)
     document.addEventListener('mouseleave', onLeave)
     document.addEventListener('mouseenter', onEnter)
-    window.addEventListener('scroll',       onScroll, { passive: true })
+    window.addEventListener('element-drag',    onDrag)
+    window.addEventListener('element-scale',   onScale)
+    window.addEventListener('element-rotate',  onRotate)
     window.addEventListener('rafi-flee',    onRafiFlee    as EventListener)
     window.addEventListener('rafi-recover', onRafiRecover as EventListener)
     window.addEventListener('rafi-correct', onRafiCorrect as EventListener)
 
-    goIdle()
+    // Don't show idle immediately — wait for genuine stillness
+    idleTimer.current = setTimeout(goIdle, 3000)
 
     const loop = () => {
       if (cursorRef.current) {
@@ -144,21 +145,21 @@ export default function CustomCursor() {
 
     return () => {
       document.removeEventListener('mousemove',  onMove)
-      document.removeEventListener('mouseover',  onOver)
-      document.removeEventListener('mouseout',   onOut)
       document.removeEventListener('mousedown',  onDown)
       document.removeEventListener('mouseup',    onUp)
       document.removeEventListener('mouseleave', onLeave)
       document.removeEventListener('mouseenter', onEnter)
-      window.removeEventListener('scroll',       onScroll)
+      window.removeEventListener('element-drag',   onDrag)
+      window.removeEventListener('element-scale',  onScale)
+      window.removeEventListener('element-rotate', onRotate)
       window.removeEventListener('rafi-flee',    onRafiFlee    as EventListener)
       window.removeEventListener('rafi-recover', onRafiRecover as EventListener)
       window.removeEventListener('rafi-correct', onRafiCorrect as EventListener)
       cancelAnimationFrame(raf.current)
       if (revertTimer.current) clearTimeout(revertTimer.current)
       if (idleTimer.current)   clearTimeout(idleTimer.current)
+      if (sleepTimer.current)  clearTimeout(sleepTimer.current)
       if (moveTimer.current)   clearTimeout(moveTimer.current)
-      if (scrollTimer.current) clearTimeout(scrollTimer.current)
     }
   }, [visible])
 
@@ -187,7 +188,7 @@ export default function CustomCursor() {
         }}
       >
         <span className="text-black font-medium text-[13px] leading-none tracking-[-0.04em] font-sans">
-          awesome-guest · <span ref={labelRef}>{pick(LABELS.idle)}</span>
+          awesome-guest · <span ref={labelRef}></span>
         </span>
       </div>
     </div>

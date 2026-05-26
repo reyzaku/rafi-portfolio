@@ -121,6 +121,7 @@ export default function NotFound() {
       targetY = t.y
     }
 
+    ;(window as any).__rafiPresent = true
     cur.style.opacity = '1'
     startWander()
 
@@ -172,6 +173,7 @@ export default function NotFound() {
     window.addEventListener('mouseleave', onLeave)
 
     return () => {
+      ;(window as any).__rafiPresent = false
       cancelAnimationFrame(rafId)
       clearTimeout(idleTimer)
       window.removeEventListener('mousemove', onMove)

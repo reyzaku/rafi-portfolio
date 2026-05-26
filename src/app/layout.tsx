@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Bricolage_Grotesque } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import CustomCursor from '@/components/ui/CustomCursor'
+import IdleRafi from '@/components/ui/IdleRafi'
 import SelectionBox from '@/components/ui/SelectionBox'
 import Ruler from '@/components/ui/Ruler'
 import SelectionOverlay from '@/components/ui/SelectionOverlay'
@@ -30,6 +31,7 @@ export default function RootLayout({
           <Ruler />
           <SelectionOverlay />
           <CustomCursor />
+          <IdleRafi />
           <SelectionBox />
         </div>
         <Analytics />
