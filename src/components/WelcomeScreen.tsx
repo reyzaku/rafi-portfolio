@@ -53,17 +53,18 @@ export default function WelcomeScreen() {
     const cursor = cursorRef.current
     if (!screen || !cursor) return
 
-    const cx = window.innerWidth / 2 - 11
-    const cy = window.innerHeight / 2
+    const cx     = window.innerWidth / 2 - 11
+    const cy     = window.innerHeight / 2
+    const startY = window.innerHeight + 40
 
-    // Place cursor off-screen top
+    // Place cursor off-screen bottom
     cursor.style.left    = cx + 'px'
-    cursor.style.top     = '-40px'
+    cursor.style.top     = startY + 'px'
     cursor.style.opacity = '1'
 
-    // Phase 1 — cursor drops to center (ease-out, 550ms)
+    // Phase 1 — cursor rises from bottom to center (ease-out, 550ms)
     animateTo(550, easeOutCubic, (p) => {
-      cursor.style.top = (-40 + (cy + 40) * p) + 'px'
+      cursor.style.top = (startY + (cy - startY) * p) + 'px'
     }, () => {
       // Brief pause — cursor "grabs" the screen
       setTimeout(() => {
