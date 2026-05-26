@@ -7,7 +7,10 @@ const R = RULER_SIZE
 
 function drawH(canvas: HTMLCanvasElement, cx: number, sel: SelectionBounds) {
   const ctx = canvas.getContext('2d')!
-  const W = canvas.width, H = canvas.height
+  const dpr = window.devicePixelRatio || 1
+  const W = canvas.width / dpr, H = canvas.height / dpr
+  ctx.save()
+  ctx.scale(dpr, dpr)
   ctx.clearRect(0, 0, W, H)
 
   ctx.fillStyle = 'rgba(0,0,0,0.38)'
@@ -70,11 +73,15 @@ function drawH(canvas: HTMLCanvasElement, cx: number, sel: SelectionBounds) {
     ctx.fillStyle = '#000'
     ctx.fillText(label, bx, 11)
   }
+  ctx.restore()
 }
 
 function drawV(canvas: HTMLCanvasElement, cy: number, sel: SelectionBounds) {
   const ctx = canvas.getContext('2d')!
-  const W = canvas.width, H = canvas.height
+  const dpr = window.devicePixelRatio || 1
+  const W = canvas.width / dpr, H = canvas.height / dpr
+  ctx.save()
+  ctx.scale(dpr, dpr)
   ctx.clearRect(0, 0, W, H)
 
   ctx.fillStyle = 'rgba(0,0,0,0.38)'
@@ -151,6 +158,7 @@ function drawV(canvas: HTMLCanvasElement, cy: number, sel: SelectionBounds) {
     ctx.fillText(label, 0, 0)
     ctx.restore()
   }
+  ctx.restore()
 }
 
 export default function Ruler() {
@@ -168,8 +176,21 @@ export default function Ruler() {
     const unsub = selectionStore.subscribe(b => { selRef.current = b; redraw() })
 
     const resize = () => {
-      if (hRef.current) { hRef.current.width = window.innerWidth - R; hRef.current.height = R }
-      if (vRef.current) { vRef.current.width = R; vRef.current.height = window.innerHeight - R }
+      const dpr = window.devicePixelRatio || 1
+      if (hRef.current) {
+        const lw = window.innerWidth - R, lh = R
+        hRef.current.width  = lw * dpr
+        hRef.current.height = lh * dpr
+        hRef.current.style.width  = lw + 'px'
+        hRef.current.style.height = lh + 'px'
+      }
+      if (vRef.current) {
+        const lw = R, lh = window.innerHeight - R
+        vRef.current.width  = lw * dpr
+        vRef.current.height = lh * dpr
+        vRef.current.style.width  = lw + 'px'
+        vRef.current.style.height = lh + 'px'
+      }
       redraw()
     }
 
