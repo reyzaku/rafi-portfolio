@@ -4,151 +4,121 @@ import { useEffect, useRef } from 'react'
 import Nav from '@/components/layout/Nav'
 import Link from 'next/link'
 
-const RAFI_LABELS = ['Rafi · found it!', 'Rafi · got you...', 'Rafi · almost...']
+const FLEE_LABELS   = ['Rafi · nope!', 'Rafi · bye!', 'Rafi · not today', 'Rafi · leave me alone']
+const IDLE_LABELS   = ['Rafi · chilling...', 'Rafi · hmm...', 'Rafi · vibing', 'Rafi · ...']
+const WANDER_LABELS = ['Rafi · exploring...', 'Rafi · where am i', 'Rafi · just wandering']
+
+function pick(arr: string[]) { return arr[Math.floor(Math.random() * arr.length)] }
 
 export default function NotFound() {
-  const textRef   = useRef<HTMLDivElement>(null)
   const cursorRef = useRef<HTMLDivElement>(null)
   const labelRef  = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const el  = textRef.current!
     const cur = cursorRef.current!
     const lbl = labelRef.current!
-    if (!el || !cur || !lbl) return
 
-    // 404 physics
+    const PAD         = 100
+    const FLEE_DIST   = 180
+    const WANDER_EASE = 0.035
+    const FLEE_EASE   = 0.12
+
     let posX = window.innerWidth  / 2
     let posY = window.innerHeight / 2
-    let velX = 0, velY = 0
+    let targetX = posX, targetY = posY
     let mouseX = -999, mouseY = -999
-    let rafiX  = -999, rafiY  = -999
-    let rafId  = 0
+    let state: 'wander' | 'idle' | 'flee' = 'wander'
+    let idleTimer = 0
+    let rafId = 0
 
-    const REPEL_R  = 220
-    const REPEL_F  = 18
-    const DAMPING  = 0.88
-    const RESTORE  = 0.0015
-
-    function clamp(v: number, min: number, max: number) { return Math.max(min, Math.min(max, v)) }
-
-    function applyRepel(cx: number, cy: number, force: number) {
-      const dx   = posX - cx
-      const dy   = posY - cy
-      const dist = Math.sqrt(dx * dx + dy * dy)
-      if (dist < REPEL_R && dist > 0) {
-        const f = ((REPEL_R - dist) / REPEL_R) * force
-        velX += (dx / dist) * f
-        velY += (dy / dist) * f
+    function bounds() {
+      return {
+        minX: PAD, maxX: window.innerWidth  - PAD,
+        minY: PAD, maxY: window.innerHeight - PAD,
       }
     }
 
+    function clamp(v: number, min: number, max: number) { return Math.max(min, Math.min(max, v)) }
+
+    function randomTarget() {
+      const b = bounds()
+      return {
+        x: b.minX + Math.random() * (b.maxX - b.minX),
+        y: b.minY + Math.random() * (b.maxY - b.minY),
+      }
+    }
+
+    function startWander() {
+      state = 'wander'
+      const t = randomTarget()
+      targetX = t.x; targetY = t.y
+      lbl.textContent = pick(WANDER_LABELS)
+    }
+
+    function startIdle() {
+      state = 'idle'
+      lbl.textContent = pick(IDLE_LABELS)
+      idleTimer = window.setTimeout(startWander, 800 + Math.random() * 2200)
+    }
+
+    function startFlee(mx: number, my: number) {
+      if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0 }
+      state = 'flee'
+      lbl.textContent = pick(FLEE_LABELS)
+      // Set flee target far away from mouse
+      const dx  = posX - mx
+      const dy  = posY - my
+      const len = Math.sqrt(dx * dx + dy * dy) || 1
+      const b   = bounds()
+      targetX = clamp(posX + (dx / len) * 350, b.minX, b.maxX)
+      targetY = clamp(posY + (dy / len) * 350, b.minY, b.maxY)
+    }
+
+    cur.style.opacity = '1'
+    startWander()
+
     function loop() {
-      // Drift back to center
-      velX += (window.innerWidth  / 2 - posX) * RESTORE
-      velY += (window.innerHeight / 2 - posY) * RESTORE
+      const dx   = mouseX - posX
+      const dy   = mouseY - posY
+      const dist = Math.sqrt(dx * dx + dy * dy)
 
-      applyRepel(mouseX, mouseY, REPEL_F)
-      applyRepel(rafiX,  rafiY,  REPEL_F * 1.4)
+      if (dist < FLEE_DIST && mouseX > -900) {
+        if (state !== 'flee') startFlee(mouseX, mouseY)
+        // Keep updating flee target while mouse is close
+        const b   = bounds()
+        const len = Math.sqrt(dx * dx + dy * dy) || 1
+        targetX = clamp(posX + (-dx / len) * 300, b.minX, b.maxX)
+        targetY = clamp(posY + (-dy / len) * 300, b.minY, b.maxY)
+      } else if (state === 'flee') {
+        startWander()
+      }
 
-      velX *= DAMPING
-      velY *= DAMPING
-      posX  = clamp(posX + velX, 160, window.innerWidth  - 160)
-      posY  = clamp(posY + velY, 120, window.innerHeight - 120)
+      const ease = state === 'flee' ? FLEE_EASE : WANDER_EASE
+      posX += (targetX - posX) * ease
+      posY += (targetY - posY) * ease
 
-      el.style.left = posX + 'px'
-      el.style.top  = posY + 'px'
+      cur.style.left = posX + 'px'
+      cur.style.top  = posY + 'px'
+
+      // Arrived at wander target → idle
+      if (state === 'wander' && Math.abs(targetX - posX) < 4 && Math.abs(targetY - posY) < 4) {
+        startIdle()
+      }
 
       rafId = requestAnimationFrame(loop)
     }
     rafId = requestAnimationFrame(loop)
 
     const onMove = (e: MouseEvent) => { mouseX = e.clientX; mouseY = e.clientY }
+    const onLeave = () => { mouseX = -999; mouseY = -999 }
     window.addEventListener('mousemove', onMove)
-
-    // Rafi cursor chase sequence
-    let rafiTimer: ReturnType<typeof setTimeout>
-
-    function runRafiChase() {
-      const label = RAFI_LABELS[Math.floor(Math.random() * RAFI_LABELS.length)]
-      lbl.textContent = label
-
-      // Spawn from a random edge
-      const edge = Math.floor(Math.random() * 4)
-      let sx = 0, sy = 0
-      if (edge === 0) { sx = Math.random() * window.innerWidth; sy = -40 }
-      if (edge === 1) { sx = window.innerWidth + 40; sy = Math.random() * window.innerHeight }
-      if (edge === 2) { sx = Math.random() * window.innerWidth; sy = window.innerHeight + 40 }
-      if (edge === 3) { sx = -40; sy = Math.random() * window.innerHeight }
-
-      cur.style.left    = sx + 'px'
-      cur.style.top     = sy + 'px'
-      cur.style.opacity = '1'
-      rafiX = sx; rafiY = sy
-
-      let cx = sx, cy = sy
-      let gave_up = false
-
-      function chaseLoop() {
-        if (gave_up) return
-
-        const tx = posX - 11
-        const ty = posY - 10
-        const dx = tx - cx
-        const dy = ty - cy
-        const dist = Math.sqrt(dx * dx + dy * dy)
-
-        // Spring toward 404
-        cx += dx * 0.045
-        cy += dy * 0.045
-        rafiX = cx; rafiY = cy
-
-        cur.style.left = cx + 'px'
-        cur.style.top  = cy + 'px'
-
-        if (dist < 60) {
-          // Almost got it — 404 dodges hard, Rafi gives up
-          velX += (Math.random() - 0.5) * 40
-          velY += (Math.random() - 0.5) * 40
-          gave_up = true
-          lbl.textContent = 'Rafi · bro...'
-          rafiX = -999; rafiY = -999
-
-          // Rafi slinks off screen
-          setTimeout(() => {
-            const exitX = cx < window.innerWidth / 2 ? -80 : window.innerWidth + 80
-            const exitY = cy
-
-            let ex = cx, ey = cy
-            function exit() {
-              ex += (exitX - ex) * 0.06
-              ey += (exitY - ey) * 0.06
-              cur.style.left = ex + 'px'
-              cur.style.top  = ey + 'px'
-              if (Math.abs(exitX - ex) > 2) requestAnimationFrame(exit)
-              else { cur.style.opacity = '0'; scheduleNextChase() }
-            }
-            requestAnimationFrame(exit)
-          }, 300)
-          return
-        }
-
-        requestAnimationFrame(chaseLoop)
-      }
-      requestAnimationFrame(chaseLoop)
-    }
-
-    function scheduleNextChase() {
-      rafiTimer = setTimeout(runRafiChase, 5000 + Math.random() * 3000)
-    }
-
-    // First chase after 3s
-    rafiTimer = setTimeout(runRafiChase, 3000)
+    window.addEventListener('mouseleave', onLeave)
 
     return () => {
       cancelAnimationFrame(rafId)
-      clearTimeout(rafiTimer)
+      clearTimeout(idleTimer)
       window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseleave', onLeave)
     }
   }, [])
 
@@ -163,50 +133,38 @@ export default function NotFound() {
 
       <Nav />
 
-      {/* 404 text — floats and runs away */}
-      <div
-        ref={textRef}
-        style={{
-          position: 'absolute', transform: 'translate(-50%, -50%)',
-          zIndex: 10, pointerEvents: 'none', userSelect: 'none',
-          textAlign: 'center',
-        }}
-      >
+      {/* Static 404 */}
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 pointer-events-none select-none">
         <h1 style={{
-          fontSize: 'clamp(100px, 20vw, 260px)', fontWeight: 700,
+          fontSize: 'clamp(100px, 22vw, 280px)', fontWeight: 700,
           letterSpacing: '-0.06em', color: '#ffffff', lineHeight: 1,
-          textShadow: '0 0 80px rgba(92,255,133,0.2)',
+          textShadow: '0 0 120px rgba(92,255,133,0.15)',
         }}>404</h1>
-      </div>
-
-      {/* Static text + button — bottom center */}
-      <div className="absolute bottom-[12%] left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-5 select-none">
         <p style={{
           fontSize: 'clamp(13px, 1.5vw, 16px)', fontWeight: 400,
-          color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em',
-          textAlign: 'center', whiteSpace: 'nowrap',
+          color: 'rgba(255,255,255,0.45)', letterSpacing: '-0.02em',
         }}>Bro, how did you end up here?</p>
-        <Link href="/">
+        <Link href="/" style={{ pointerEvents: 'auto' }}>
           <button style={{
+            marginTop: 12,
             backgroundColor: '#5CFF85', color: '#000',
             fontSize: 'clamp(13px, 1.5vw, 16px)', fontWeight: 700,
             letterSpacing: '-0.04em', padding: '12px 36px',
             borderRadius: '37px', border: 'none',
             fontFamily: 'inherit', cursor: 'pointer',
-            whiteSpace: 'nowrap',
           }}>
             Take me home
           </button>
         </Link>
       </div>
 
-      {/* Rafi chase cursor */}
+      {/* Rafi wandering cursor */}
       <div
         ref={cursorRef}
         style={{
           position: 'fixed', pointerEvents: 'none', opacity: 0,
           display: 'flex', alignItems: 'flex-start', gap: 5,
-          zIndex: 9999, transition: 'opacity 0.2s',
+          zIndex: 9999,
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -217,7 +175,7 @@ export default function NotFound() {
           padding: '5px 10px', borderRadius: 3,
           whiteSpace: 'nowrap', letterSpacing: '0.01em',
           boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
-        }}>Rafi · found it!</div>
+        }}>Rafi · exploring...</div>
       </div>
     </main>
   )
