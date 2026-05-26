@@ -98,12 +98,12 @@ export default function WelcomeScreen() {
         <Image src="/logo-green.png" alt="Rafi" width={52} height={52} style={{ objectFit: 'contain' }} priority />
       </div>
 
-      {/* Hello, */}
+      {/* Hello */}
       <p className="ws-hello" style={{
         fontSize: 'clamp(12px, 1.8vw, 15px)', fontWeight: 600,
         color: 'rgba(255,255,255,0.5)', letterSpacing: '0.18em',
         textTransform: 'uppercase', marginBottom: 10,
-      }}>Hello,</p>
+      }}>Hello</p>
 
       {/* Welcome to my portfolio */}
       <h1 className="ws-title" style={{
