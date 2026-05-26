@@ -135,13 +135,19 @@ export default function Hero() {
           elVX - 14, elVY - 10, 0.014, 0.86,
           () => {
             lbl.textContent = 'Rafi · dragging...'
+            const r0 = el.getBoundingClientRect()
+            selectionStore.set({ x: r0.left, y: r0.top, w: r0.width, h: r0.height, id: el.id })
             setTimeout(() => {
               const destVX = hr.left + orig.left - 14
               const destVY = hr.top  + orig.top  - 10
 
               runSpring(
                 () => ({ x: parseFloat(el.style.left), y: parseFloat(el.style.top) }),
-                (x, y) => { el.style.left = x + 'px'; el.style.top = y + 'px' },
+                (x, y) => {
+                  el.style.left = x + 'px'; el.style.top = y + 'px'
+                  const r1 = el.getBoundingClientRect()
+                  selectionStore.set({ x: r1.left, y: r1.top, w: r1.width, h: r1.height, id: el.id })
+                },
                 orig.left, orig.top, 0.06, 0.78
               )
 
@@ -175,6 +181,7 @@ export default function Hero() {
                     tst.style.opacity   = '0'
                     tst.style.transform = 'translateY(8px)'
                     el.classList.remove('correcting')
+                    selectionStore.set(null)
                     isCorrecting.current = false
                   }, 1200)
                 }
@@ -222,6 +229,8 @@ export default function Hero() {
           elVX - 14, elVY - 10, 0.014, 0.86,
           () => {
             lbl.textContent = 'Rafi · resetting...'
+            const r0 = el.getBoundingClientRect()
+            selectionStore.set({ x: r0.left, y: r0.top, w: r0.width, h: r0.height, id: el.id })
 
             let { scale: sv, rotation: rv } = transformStore.get(el.id)
             function tweenTransform() {
@@ -231,6 +240,8 @@ export default function Hero() {
                 sv = 1; rv = 0
                 el.style.transform = 'none'
                 transformStore.set(el.id, { scale: 1, rotation: 0 })
+                const r1 = el.getBoundingClientRect()
+                selectionStore.set({ x: r1.left, y: r1.top, w: r1.width, h: r1.height, id: el.id })
 
                 lbl.textContent = 'Rafi · done ✓'
                 const baseX = parseFloat(cur.style.left)
@@ -257,12 +268,15 @@ export default function Hero() {
                   tst.style.opacity   = '0'
                   tst.style.transform = 'translateY(8px)'
                   el.classList.remove('correcting')
+                  selectionStore.set(null)
                   isCorrecting.current = false
                 }, 1200)
                 return
               }
               el.style.transform = `scale(${sv}) rotate(${rv}deg)`
               transformStore.set(el.id, { scale: sv, rotation: rv })
+              const r2 = el.getBoundingClientRect()
+              selectionStore.set({ x: r2.left, y: r2.top, w: r2.width, h: r2.height, id: el.id })
               requestAnimationFrame(tweenTransform)
             }
             tweenTransform()
