@@ -54,27 +54,26 @@ export default function WelcomeScreen() {
     const cursor = cursorRef.current
     if (!screen || !cursor) return
 
-    const cx     = window.innerWidth / 2 - 11
-    const cy     = window.innerHeight / 2
-    const startY = window.innerHeight + 40
+    const cx      = window.innerWidth / 2 - 11
+    const grabY   = window.innerHeight - 80  // near the bottom
+    const startY  = -40                       // off-screen top
 
-    // Fix #1: cursor is now a sibling (outside the screen div), so position: fixed
-    // is relative to the viewport, not the transformed parent.
+    // Place cursor off-screen top
     cursor.style.left    = cx + 'px'
     cursor.style.top     = startY + 'px'
     cursor.style.opacity = '1'
 
-    // Phase 1 — cursor rises from bottom to center (ease-out, 550ms)
-    animateTo(550, easeOutCubic, (p) => {
-      cursor.style.top = (startY + (cy - startY) * p) + 'px'
+    // Phase 1 — cursor travels from top to near bottom (ease-in-out, 800ms)
+    animateTo(800, easeInOutCubic, (p) => {
+      cursor.style.top = (startY + (grabY - startY) * p) + 'px'
     }, () => {
-      // Brief pause — cursor "grabs" the screen
+      // Brief pause — cursor "grabs" the bottom of the screen
       setTimeout(() => {
-        // Phase 2 — screen + cursor slide up off viewport (ease-in-out, 1050ms)
+        // Phase 2 — screen + cursor drag up off viewport (ease-in-out, 1050ms)
         const dist = window.innerHeight + 60
         animateTo(1050, easeInOutCubic, (p) => {
           screen.style.transform = `translateY(${-dist * p}px)`
-          cursor.style.top       = (cy - dist * p) + 'px'
+          cursor.style.top       = (grabY - dist * p) + 'px'
         }, () => {
           setGone(true)
         })
