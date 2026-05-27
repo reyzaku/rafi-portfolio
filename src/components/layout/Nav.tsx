@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import {
@@ -9,6 +10,7 @@ import {
   UserIcon,
   PhoneIcon,
 } from '@heroicons/react/24/solid'
+import { navigateWithTransition } from '@/lib/page-transition'
 
 // ── Config ────────────────────────────────────────────────────────────
 
@@ -20,6 +22,13 @@ const NAV_ITEMS = [
 ] as const
 
 type NavId = (typeof NAV_ITEMS)[number]['id']
+
+const ROUTES: Record<NavId, string> = {
+  home:    '/',
+  work:    '/work',
+  about:   '/about',
+  contact: '/contact',
+}
 
 // ── NavIcon ───────────────────────────────────────────────────────────
 
@@ -142,9 +151,15 @@ function ContactButton({ compact = false }: { compact?: boolean }) {
   const txtSize = compact ? 'text-[14px]' : 'text-[16px]'
   const txtHoverX = compact ? -26 : -34
 
+  function handleClick(e: React.MouseEvent) {
+    e.preventDefault()
+    navigateWithTransition('/contact')
+  }
+
   return (
     <motion.a
-      href="#contact"
+      href="/contact"
+      onClick={handleClick}
       className={`relative flex ${w} ${h} rounded-[100px] bg-[rgba(255,255,255,0.15)] backdrop-blur-[7.5px] overflow-hidden cursor-pointer`}
       initial="rest"
       whileHover="hover"
@@ -181,12 +196,23 @@ function ContactButton({ compact = false }: { compact?: boolean }) {
 // ── Nav ───────────────────────────────────────────────────────────────
 
 export default function Nav() {
+  const pathname = usePathname()
   const [hoveredId, setHoveredId] = useState<NavId | null>(null)
-  const [activeId, setActiveId]   = useState<NavId>('home')
+
+  const activeId: NavId = (
+    NAV_ITEMS.find(item => {
+      const route = ROUTES[item.id]
+      return route === '/' ? pathname === '/' : pathname.startsWith(route)
+    })?.id ?? 'home'
+  )
 
   const tooltipLabel = hoveredId
     ? (NAV_ITEMS.find(i => i.id === hoveredId)?.label ?? '')
     : ''
+
+  function handleNavClick(id: NavId) {
+    navigateWithTransition(ROUTES[id])
+  }
 
   return (
     <>
@@ -204,7 +230,7 @@ export default function Nav() {
             activeId={activeId}
             onHoverIn={id => setHoveredId(id)}
             onHoverOut={() => setHoveredId(null)}
-            onClick={id => setActiveId(id)}
+            onClick={handleNavClick}
           />
           {/* Tooltip slot — desktop: top-[115px] in Figma = 37+66+12 */}
           <div style={{ marginTop: '32px' }}>
@@ -236,7 +262,7 @@ export default function Nav() {
             activeId={activeId}
             onHoverIn={id => setHoveredId(id)}
             onHoverOut={() => setHoveredId(null)}
-            onClick={id => setActiveId(id)}
+            onClick={handleNavClick}
           />
         </div>
       </div>
