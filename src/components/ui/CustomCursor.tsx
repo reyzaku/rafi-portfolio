@@ -26,6 +26,11 @@ export default function CustomCursor() {
   const isSleeping  = useRef(false)
 
   useEffect(() => {
+    document.body.classList.add('custom-cursor')
+    return () => document.body.classList.remove('custom-cursor')
+  }, [])
+
+  useEffect(() => {
     const lbl = labelRef.current!
 
     function setLabel(text: string) {

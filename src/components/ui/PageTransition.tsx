@@ -37,8 +37,9 @@ function animateTo(
 // gripping the sheet and pulling it)
 const GRIP_OFFSET = 10 // px
 
-// Duration for each half of the transition
-const SLIDE_MS = 680
+// Duration for each phase
+const SLIDE_MS = 680  // curtain slide
+const WALK_MS  = 500  // cursor walking down to grab the bottom
 
 // ── component ─────────────────────────────────────────────────────────────
 
@@ -67,23 +68,34 @@ export default function PageTransition() {
     const vh = window.innerHeight
     const cx = window.innerWidth / 2 - 11
 
-    // Overlay is currently covering the screen (translateY 0).
-    // Cursor sits just above the overlay's top edge (y = -GRIP_OFFSET).
+    // Curtain is covering the screen. Cursor is just above the top of the
+    // viewport (left over from exit phase — it slid off the top edge).
+    // Phase 1: cursor walks DOWN organically over the dark curtain to reach
+    //          the bottom — like Rafi strolling down to grab it.
+    // Phase 2: cursor grabs the bottom edge, both slide UP to reveal new page.
     overlay.style.transform = 'translateY(0)'
     cursor.style.left    = cx + 'px'
-    cursor.style.top     = (-GRIP_OFFSET) + 'px'
+    cursor.style.top     = (-GRIP_OFFSET) + 'px'  // just above viewport from exit
     cursor.style.opacity = '1'
 
-    // Brief pause — let new page render underneath before pulling away
+    // Brief pause — let new page render underneath before the reveal starts
     const pauseId = setTimeout(() => {
-      animateTo(SLIDE_MS, easeInOutCubic, (p) => {
-        const shift = vh * p
-        overlay.style.transform = `translateY(${-shift}px)`
-        cursor.style.top = (-GRIP_OFFSET - shift) + 'px'
+      // Phase 1: walk down to the bottom of the curtain
+      animateTo(WALK_MS, easeInOutCubic, (p) => {
+        cursor.style.top = (-GRIP_OFFSET + vh * p) + 'px'
       }, () => {
-        cursor.style.opacity = '0'
-        overlay.style.transform = 'translateY(-100%)'
-        busyRef.current = false
+        // Phase 2: grab + drag curtain upward
+        setTimeout(() => {
+          animateTo(SLIDE_MS, easeInOutCubic, (p) => {
+            const shift = vh * p
+            overlay.style.transform = `translateY(${-shift}px)`
+            cursor.style.top = (vh - GRIP_OFFSET - shift) + 'px'
+          }, () => {
+            cursor.style.opacity = '0'
+            overlay.style.transform = 'translateY(-100%)'
+            busyRef.current = false
+          })
+        }, 100)
       })
     }, 60)
 
@@ -103,21 +115,22 @@ export default function PageTransition() {
       const vh = window.innerHeight
       const cx = window.innerWidth / 2 - 11
 
-      // Overlay starts just below the viewport; cursor sits at its top edge
+      // Curtain starts below viewport. Cursor sits at the TOP edge of the
+      // curtain — Rafi grips the leading edge and pulls it up to cover.
       overlay.style.transform = `translateY(${vh}px)`
       cursor.style.left    = cx + 'px'
       cursor.style.top     = (vh - GRIP_OFFSET) + 'px'
       cursor.style.opacity = '1'
 
-      // Exit: cursor + overlay both slide up by vh → screen covered
+      // Exit: cursor + curtain both slide up by vh → screen fully covered.
+      // Cursor ends just above the top of the viewport (-GRIP_OFFSET).
+      // We do NOT hide it — entry phase picks it up from there and walks
+      // it back down organically over the dark curtain.
       animateTo(SLIDE_MS, easeInOutCubic, (p) => {
         const shift = vh * p
         overlay.style.transform = `translateY(${vh - shift}px)`
         cursor.style.top = (vh - GRIP_OFFSET - shift) + 'px'
       }, () => {
-        // Screen is now fully covered — navigate.
-        // Entry useEffect will handle the reveal once pathname updates.
-        cursor.style.opacity = '0'
         router.push(path)
       })
     })

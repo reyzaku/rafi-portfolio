@@ -22,11 +22,10 @@ body {
   background: #011910;
   color: #ffffff;
   -webkit-font-smoothing: antialiased;
-  cursor: none;
 }
 
-@media (pointer: fine) {
-  * {
-    cursor: none !important;
-  }
+/* Hide native cursor only on home page where custom cursor is active */
+body.custom-cursor,
+body.custom-cursor * {
+  cursor: none !important;
 }

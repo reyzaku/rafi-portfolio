@@ -2,11 +2,9 @@ import type { Metadata } from 'next'
 import { Bricolage_Grotesque } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import CustomCursor from '@/components/ui/CustomCursor'
+import HomeOnlyLayer from '@/components/ui/HomeOnlyLayer'
 import IdleRafi from '@/components/ui/IdleRafi'
 import PageTransition from '@/components/ui/PageTransition'
-import SelectionBox from '@/components/ui/SelectionBox'
-import Ruler from '@/components/ui/Ruler'
-import SelectionOverlay from '@/components/ui/SelectionOverlay'
 import './globals.css'
 
 const bricolage = Bricolage_Grotesque({
@@ -28,13 +26,14 @@ export default function RootLayout({
       <body className="h-full overflow-hidden antialiased font-sans">
         {children}
         <PageTransition />
-        {/* Desktop-only Figma-style tools */}
+        {/* Always-on tools — desktop only */}
         <div className="hidden md:block">
-          <Ruler />
-          <SelectionOverlay />
           <CustomCursor />
           <IdleRafi />
-          <SelectionBox />
+        </div>
+        {/* Figma editing tools — home page only, desktop only */}
+        <div className="hidden md:block">
+          <HomeOnlyLayer />
         </div>
         <Analytics />
       </body>
