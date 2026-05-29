@@ -10,6 +10,8 @@ const LABELS = {
   flee:    ['come back!', 'wait wait', 'i don\'t bite', 'why run', 'just saying hi', 'hey!!'],
   recover: ['i did nothing', 'ok my bad', 'sorry lol', 'i\'ll behave'],
   correct: ['ok my bad', 'sorry sorry', 'i was playing', 'i\'ll put it back', 'ok i get it', 'rafi pls'],
+  boot:    ['loading...', 'booting up', 'just a sec...', 'starting...', 'warming up'],
+  loaded:  ['there we go', 'nice choice', 'good pick', 'ready', 'enjoy'],
 }
 
 function pick(arr: string[]) { return arr[Math.floor(Math.random() * arr.length)] }
@@ -83,6 +85,10 @@ export default function CustomCursor() {
     const onRafiRecover = () => { setLabel(pick(LABELS.recover)); revertToIdle(2800) }
     const onRafiCorrect = () => { setLabel(pick(LABELS.correct)); revertToIdle(2800) }
 
+    // Work page boot reactions
+    const onWorkBootStart = () => { setLabel(pick(LABELS.boot)) }
+    const onWorkBootDone  = () => { setLabel(pick(LABELS.loaded)); revertToIdle(2000) }
+
     const onLeave = () => setVisible(false)
     const onEnter = () => setVisible(true)
 
@@ -97,6 +103,8 @@ export default function CustomCursor() {
     window.addEventListener('rafi-flee',    onRafiFlee    as EventListener)
     window.addEventListener('rafi-recover', onRafiRecover as EventListener)
     window.addEventListener('rafi-correct', onRafiCorrect as EventListener)
+    window.addEventListener('work-boot-start', onWorkBootStart)
+    window.addEventListener('work-boot-done',  onWorkBootDone)
 
     scheduleSleep()
 
@@ -120,6 +128,8 @@ export default function CustomCursor() {
       window.removeEventListener('rafi-flee',    onRafiFlee    as EventListener)
       window.removeEventListener('rafi-recover', onRafiRecover as EventListener)
       window.removeEventListener('rafi-correct', onRafiCorrect as EventListener)
+      window.removeEventListener('work-boot-start', onWorkBootStart)
+      window.removeEventListener('work-boot-done',  onWorkBootDone)
       cancelAnimationFrame(raf.current)
       if (revertTimer.current) clearTimeout(revertTimer.current)
       if (sleepTimer.current)  clearTimeout(sleepTimer.current)
