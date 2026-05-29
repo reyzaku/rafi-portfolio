@@ -5,6 +5,7 @@ import CustomCursor from '@/components/ui/CustomCursor'
 import HomeOnlyLayer from '@/components/ui/HomeOnlyLayer'
 import IdleRafi from '@/components/ui/IdleRafi'
 import PageTransition from '@/components/ui/PageTransition'
+import Ruler from '@/components/ui/Ruler'
 import './globals.css'
 
 const bricolage = Bricolage_Grotesque({
@@ -23,11 +24,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${bricolage.variable} h-full`}>
-      <body className="h-full overflow-hidden antialiased font-sans">
+      <body className="min-h-full antialiased font-sans">
         {children}
         <PageTransition />
         {/* Always-on tools — desktop only */}
         <div className="hidden md:block">
+          <Ruler />
           <CustomCursor />
           <IdleRafi />
         </div>

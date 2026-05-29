@@ -3,7 +3,6 @@
 import { usePathname } from 'next/navigation'
 import SelectionBox from './SelectionBox'
 import SelectionOverlay from './SelectionOverlay'
-import Ruler from '../ui/Ruler'
 
 // Figma-style editing tools — home page only
 export default function HomeOnlyLayer() {
@@ -12,7 +11,6 @@ export default function HomeOnlyLayer() {
 
   return (
     <>
-      <Ruler />
       <SelectionOverlay />
       <SelectionBox />
     </>

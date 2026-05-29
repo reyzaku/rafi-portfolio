@@ -15,10 +15,12 @@
   padding: 0;
 }
 
-html,
-body {
+html {
   height: 100%;
-  overflow: hidden;
+}
+
+body {
+  min-height: 100%;
   background: #011910;
   color: #ffffff;
   -webkit-font-smoothing: antialiased;
@@ -28,4 +30,23 @@ body {
 body.custom-cursor,
 body.custom-cursor * {
   cursor: none !important;
+}
+
+/* Interactive element hover glow — outline doesn't get clipped by overflow:hidden */
+@media (pointer: fine) {
+  a,
+  button,
+  [role="button"],
+  .draggable {
+    transition: outline-color 0.18s ease;
+    outline: 1.5px solid transparent;
+    outline-offset: 0;
+  }
+
+  a:hover,
+  button:hover,
+  [role="button"]:hover,
+  .draggable:hover {
+    outline-color: rgba(92, 255, 133, 0.55);
+  }
 }
