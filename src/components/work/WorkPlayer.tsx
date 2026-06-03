@@ -82,6 +82,8 @@ export default function WorkPlayer() {
   return (
     <>
       <div style={{
+        position: 'relative',
+        zIndex: 10,
         paddingTop: 120,
         paddingBottom: 160,
         paddingLeft: H_PAD,
