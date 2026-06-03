@@ -48,6 +48,8 @@ export default function PageTransition() {
   const pathname   = usePathname()
   const overlayRef = useRef<HTMLDivElement>(null)
   const cursorRef  = useRef<HTMLDivElement>(null)
+  const labelRef   = useRef<HTMLSpanElement>(null)
+  const loadingRef = useRef<HTMLDivElement>(null)
   const busyRef    = useRef(false)
   const firstRef   = useRef(true)  // skip entry anim on initial load
 
@@ -61,9 +63,14 @@ export default function PageTransition() {
       return
     }
 
-    const overlay = overlayRef.current
-    const cursor  = cursorRef.current
+    const overlay  = overlayRef.current
+    const cursor   = cursorRef.current
+    const loading  = loadingRef.current
     if (!overlay || !cursor) return
+
+    // Hide loading indicator as soon as new page is ready
+    if (loading) { loading.style.opacity = '0' }
+    if (labelRef.current) labelRef.current.textContent = 'dragging...'
 
     const vh = window.innerHeight
     const cx = window.innerWidth / 2 - 11
@@ -131,6 +138,10 @@ export default function PageTransition() {
         overlay.style.transform = `translateY(${vh - shift}px)`
         cursor.style.top = (vh - GRIP_OFFSET - shift) + 'px'
       }, () => {
+        // Curtain fully closed — show loading indicator while next page loads
+        if (labelRef.current) labelRef.current.textContent = 'loading...'
+        const loading = loadingRef.current
+        if (loading) { loading.style.opacity = '1' }
         router.push(path)
       })
     })
@@ -153,7 +164,47 @@ export default function PageTransition() {
           pointerEvents: 'none',
           willChange: 'transform',
         }}
-      />
+      >
+        {/* Loading indicator — visible only while next page is fetching */}
+        <div
+          ref={loadingRef}
+          style={{
+            position: 'absolute',
+            bottom: 48,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            opacity: 0,
+            transition: 'opacity 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            fontFamily: 'monospace',
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: '3px',
+            color: 'rgba(255,255,255,0.35)',
+            textTransform: 'uppercase',
+          }}
+        >
+          {/* Pulsing dot */}
+          <span style={{
+            display: 'inline-block',
+            width: 5,
+            height: 5,
+            borderRadius: '50%',
+            background: '#5CFF85',
+            animation: 'pt-pulse 1s ease-in-out infinite',
+          }} />
+          loading
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes pt-pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50%       { opacity: 0.3; transform: scale(0.7); }
+        }
+      `}</style>
 
       {/* Rafi cursor — outside overlay so z-index stacks above */}
       <div
@@ -183,7 +234,7 @@ export default function PageTransition() {
           letterSpacing: '0.01em',
           boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
         }}>
-          Rafi · dragging...
+          Rafi · <span ref={labelRef}>dragging...</span>
         </div>
       </div>
     </>
