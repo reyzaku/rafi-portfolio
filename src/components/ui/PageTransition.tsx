@@ -170,9 +170,9 @@ export default function PageTransition() {
           ref={loadingRef}
           style={{
             position: 'absolute',
-            bottom: 48,
+            top: '50%',
             left: '50%',
-            transform: 'translateX(-50%)',
+            transform: 'translate(-50%, -50%)',
             opacity: 0,
             transition: 'opacity 0.3s ease',
             display: 'flex',

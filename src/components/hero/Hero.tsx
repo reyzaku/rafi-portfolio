@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { selectionStore } from '@/lib/selection-store'
 import { transformStore, correctionBus, CorrectionReason } from '@/lib/transform-store'
+import { navigateWithTransition } from '@/lib/page-transition'
 import FloatingIcons from './FloatingIcons'
 import { HandRaisedIcon } from '@heroicons/react/24/solid'
 
@@ -311,6 +312,7 @@ function CtaButton() {
       ref={btnRef}
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
+      onClick={() => navigateWithTransition('/work')}
       className="cta-btn"
       style={{
         '--mx': '50%', '--my': '50%',
