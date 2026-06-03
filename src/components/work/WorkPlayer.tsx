@@ -203,16 +203,18 @@ export default function WorkPlayer() {
           position: 'fixed',
           zIndex: 99999,
           pointerEvents: 'none',
-          // Fade in/out
+          // Scale up from 0 on hover, spring back to 0 on exit
           opacity: hoveredId ? 1 : 0,
-          transition: 'opacity 0.18s ease',
+          transform: hoveredId ? 'rotate(-3deg) scale(1)' : 'rotate(-3deg) scale(0)',
+          transition: hoveredId
+            ? 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease'
+            : 'transform 0.2s cubic-bezier(0.4, 0, 1, 1), opacity 0.15s ease',
+          transformOrigin: 'left top',
           // Card shape
           width: 220,
           height: 140,
           borderRadius: 10,
           overflow: 'hidden',
-          // Slight tilt for feel
-          transform: 'rotate(-3deg)',
           boxShadow: '0 20px 50px rgba(0,0,0,0.55)',
           // Initial off-screen position
           left: -300,
