@@ -19,24 +19,30 @@ export default function WorkPlayer() {
   const [activeProject, setActiveProject]   = useState<Project | null>(null)
   const [hoveredId,     setHoveredId]       = useState<string | null>(null)
 
-  // ── Cursor thumbnail (rAF direct-to-DOM for zero jank) ─────────────────
-  const thumbRef   = useRef<HTMLDivElement>(null)
-  const rafRef     = useRef<number | null>(null)
-  const targetPos  = useRef({ x: 0, y: 0 })
+  // ── Cursor thumbnail — lerp follow for smooth lag effect ──────────────
+  const thumbRef  = useRef<HTMLDivElement>(null)
+  const rafRef    = useRef<number | null>(null)
+  const targetPos = useRef({ x: -400, y: -400 })
+  const curPos    = useRef({ x: -400, y: -400 })
 
   const onMouseMove = useCallback((e: MouseEvent) => {
     targetPos.current = { x: e.clientX, y: e.clientY }
-    if (rafRef.current) return
-    rafRef.current = requestAnimationFrame(() => {
-      if (thumbRef.current) {
-        thumbRef.current.style.left = (targetPos.current.x + 28) + 'px'
-        thumbRef.current.style.top  = (targetPos.current.y - 90) + 'px'
-      }
-      rafRef.current = null
-    })
   }, [])
 
   useEffect(() => {
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t
+
+    function tick() {
+      curPos.current.x = lerp(curPos.current.x, targetPos.current.x, 0.1)
+      curPos.current.y = lerp(curPos.current.y, targetPos.current.y, 0.1)
+      if (thumbRef.current) {
+        thumbRef.current.style.left = (curPos.current.x + 28) + 'px'
+        thumbRef.current.style.top  = (curPos.current.y - 90) + 'px'
+      }
+      rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
     window.addEventListener('mousemove', onMouseMove)
     return () => {
       window.removeEventListener('mousemove', onMouseMove)
@@ -84,7 +90,7 @@ export default function WorkPlayer() {
       <div style={{
         position: 'relative',
         zIndex: 10,
-        paddingTop: 120,
+        paddingTop: 160,
         paddingBottom: 160,
         paddingLeft: H_PAD,
         paddingRight: H_PAD,
