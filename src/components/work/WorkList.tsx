@@ -5,7 +5,7 @@ import { PROJECTS, Project } from '@/lib/work-data'
 import ProjectCanvas from './ProjectCanvas'
 import WorkMobile from './WorkMobile'
 
-export default function WorkPlayer() {
+export default function WorkList() {
   // ── Mobile detection ───────────────────────────────────────────────────
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {

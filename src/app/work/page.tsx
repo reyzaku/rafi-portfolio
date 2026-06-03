@@ -1,7 +1,7 @@
 'use client'
 
 import Nav from '@/components/layout/Nav'
-import WorkPlayer from '@/components/work/WorkPlayer'
+import WorkList from '@/components/work/WorkList'
 
 export default function Work() {
   return (
@@ -15,7 +15,7 @@ export default function Work() {
       }} />
 
       <Nav />
-      <WorkPlayer />
+      <WorkList />
     </main>
   )
 }
