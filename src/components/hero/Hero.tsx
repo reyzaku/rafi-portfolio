@@ -818,10 +818,11 @@ export default function Hero() {
         @media (max-width: 767px) { .draggable { display: none !important; } #el-cta { display: none !important; } }
 
         .cta-btn {
-          background: radial-gradient(circle at var(--mx) var(--my), #a8ffbe 0%, #5CFF85 45%, #2ecc5e 100%);
-          transition: background 0.05s, box-shadow 0.2s;
+          background: #5CFF85;
+          transition: box-shadow 0.2s;
         }
         .cta-btn:hover {
+          background: radial-gradient(circle at var(--mx) var(--my), #a8ffbe 0%, #5CFF85 45%, #2ecc5e 100%);
           box-shadow: 0 0 32px rgba(92,255,133,0.45);
         }
       `}</style>
