@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { PROJECTS, Project } from '@/lib/work-data'
-import ProjectCanvas from './ProjectCanvas'
+import { navigateWithTransition } from '@/lib/page-transition'
 import WorkMobile from './WorkMobile'
 
 export default function WorkList() {
@@ -16,7 +16,6 @@ export default function WorkList() {
   }, [])
 
   // ── State ──────────────────────────────────────────────────────────────
-  const [activeProject,    setActiveProject]    = useState<Project | null>(null)
   const [hoveredId,        setHoveredId]        = useState<string | null>(null)
   // Thumbnail visibility is decoupled from hovered row so rapid switching
   // keeps the card alive instead of collapsing → re-expanding between rows
@@ -75,34 +74,6 @@ export default function WorkList() {
   // ── Mobile ─────────────────────────────────────────────────────────────
   if (isMobile) return <WorkMobile />
 
-  // ── Canvas / detail view ───────────────────────────────────────────────
-  if (activeProject) {
-    return (
-      <>
-        <button
-          onClick={() => setActiveProject(null)}
-          style={{
-            position: 'fixed', top: 80, left: 20, zIndex: 9999,
-            background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.14)',
-            borderRadius: 100, padding: '7px 18px',
-            color: 'rgba(255,255,255,0.8)', cursor: 'pointer',
-            fontSize: 12, fontWeight: 600, letterSpacing: '0.04em',
-            fontFamily: 'inherit',
-            transition: 'color 0.15s, border-color 0.15s',
-          }}
-          onMouseEnter={e => { const el = e.currentTarget; el.style.color = '#fff'; el.style.borderColor = 'rgba(255,255,255,0.4)' }}
-          onMouseLeave={e => { const el = e.currentTarget; el.style.color = 'rgba(255,255,255,0.8)'; el.style.borderColor = 'rgba(255,255,255,0.14)' }}
-        >
-          ← Back
-        </button>
-        <div style={{ position: 'relative', zIndex: 10 }}>
-          <ProjectCanvas project={activeProject} />
-        </div>
-      </>
-    )
-  }
-
   // ── List view ──────────────────────────────────────────────────────────
   const H_PAD = 'max(48px, 11vw)'
 
@@ -142,7 +113,7 @@ export default function WorkList() {
               <div
                 onMouseEnter={() => handleRowEnter(project)}
                 onMouseLeave={() => handleRowLeave()}
-                onClick={() => setActiveProject(project)}
+                onClick={() => navigateWithTransition(`/work/${project.id}`)}
                 style={{
                   display: 'flex', alignItems: 'flex-start', gap: 24,
                   paddingTop: 24, paddingBottom: 24,

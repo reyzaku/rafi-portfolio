@@ -1,34 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { Project, PROJECTS } from '@/lib/work-data'
-import ProjectCanvas from './ProjectCanvas'
+import { PROJECTS } from '@/lib/work-data'
+import { navigateWithTransition } from '@/lib/page-transition'
 
 export default function WorkMobile() {
-  const [active, setActive] = useState<Project | null>(null)
-
-  if (active) {
-    return (
-      <div style={{ position: 'relative', zIndex: 10 }}>
-        <button
-          onClick={() => setActive(null)}
-          style={{
-            position: 'fixed', top: 72, left: 16, zIndex: 20,
-            background: 'rgba(10,25,18,0.92)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: 6, padding: '8px 14px',
-            color: '#fff', fontSize: 12, fontWeight: 600,
-            letterSpacing: '0.5px', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 6,
-          }}
-        >
-          ← Back
-        </button>
-        <ProjectCanvas project={active} />
-      </div>
-    )
-  }
-
   return (
     <div style={{ position: 'relative', zIndex: 10, paddingTop: 100, paddingBottom: 60, paddingLeft: 24, paddingRight: 24 }}>
       <div style={{ marginBottom: 48 }}>
@@ -47,14 +22,14 @@ export default function WorkMobile() {
           <div
             key={project.id}
             role="button"
-            onClick={() => setActive(project)}
+            onClick={() => navigateWithTransition(`/work/${project.id}`)}
             style={{
               borderBottom: '1px solid rgba(255,255,255,0.08)',
               padding: '24px 0',
               display: 'flex', alignItems: 'center', gap: 16,
+              cursor: 'pointer',
             }}
           >
-            {/* Accent dot */}
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: project.accent, flexShrink: 0 }} />
 
             <span style={{
