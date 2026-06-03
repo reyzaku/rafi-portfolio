@@ -16,8 +16,30 @@ export default function WorkList() {
   }, [])
 
   // ── State ──────────────────────────────────────────────────────────────
-  const [activeProject, setActiveProject]   = useState<Project | null>(null)
-  const [hoveredId,     setHoveredId]       = useState<string | null>(null)
+  const [activeProject,    setActiveProject]    = useState<Project | null>(null)
+  const [hoveredId,        setHoveredId]        = useState<string | null>(null)
+  // Thumbnail visibility is decoupled from hovered row so rapid switching
+  // keeps the card alive instead of collapsing → re-expanding between rows
+  const [thumbActive,      setThumbActive]      = useState(false)
+  const [displayedProject, setDisplayedProject] = useState<Project | null>(null)
+  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleRowEnter = useCallback((project: Project) => {
+    // Cancel any pending collapse
+    if (exitTimerRef.current) { clearTimeout(exitTimerRef.current); exitTimerRef.current = null }
+    setHoveredId(project.id)
+    setDisplayedProject(project)   // swap content instantly (card stays at scale 1)
+    setThumbActive(true)
+  }, [])
+
+  const handleRowLeave = useCallback(() => {
+    setHoveredId(null)
+    // Short grace period — if user enters another row within 80ms, cancel collapse
+    exitTimerRef.current = setTimeout(() => {
+      setThumbActive(false)
+      exitTimerRef.current = null
+    }, 80)
+  }, [])
 
   // ── Cursor thumbnail — lerp follow for smooth lag effect ──────────────
   const thumbRef  = useRef<HTMLDivElement>(null)
@@ -82,7 +104,6 @@ export default function WorkList() {
   }
 
   // ── List view ──────────────────────────────────────────────────────────
-  const hoveredProject = hoveredId ? PROJECTS.find(p => p.id === hoveredId) ?? null : null
   const H_PAD = 'max(48px, 11vw)'
 
   return (
@@ -124,8 +145,8 @@ export default function WorkList() {
           return (
             <div key={project.id}>
               <div
-                onMouseEnter={() => setHoveredId(project.id)}
-                onMouseLeave={() => setHoveredId(null)}
+                onMouseEnter={() => handleRowEnter(project)}
+                onMouseLeave={() => handleRowLeave()}
                 onClick={() => setActiveProject(project)}
                 style={{
                   display: 'flex', alignItems: 'flex-start', gap: 24,
@@ -203,12 +224,13 @@ export default function WorkList() {
           position: 'fixed',
           zIndex: 99999,
           pointerEvents: 'none',
-          // Scale up from 0 on hover, spring back to 0 on exit
-          opacity: hoveredId ? 1 : 0,
-          transform: hoveredId ? 'rotate(-3deg) scale(1)' : 'rotate(-3deg) scale(0)',
-          transition: hoveredId
+          // Spring up on first hover, stay alive during rapid row switching,
+          // collapse only when cursor truly leaves all rows
+          opacity: thumbActive ? 1 : 0,
+          transform: thumbActive ? 'rotate(-3deg) scale(1)' : 'rotate(-3deg) scale(0)',
+          transition: thumbActive
             ? 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease'
-            : 'transform 0.2s cubic-bezier(0.4, 0, 1, 1), opacity 0.15s ease',
+            : 'transform 0.22s cubic-bezier(0.4, 0, 1, 1), opacity 0.2s ease',
           transformOrigin: 'left top',
           // Card shape
           width: 220,
@@ -222,17 +244,17 @@ export default function WorkList() {
           willChange: 'left, top',
         }}
       >
-        {hoveredProject && (
+        {displayedProject && (
           <div style={{
             position: 'absolute', inset: 0,
             background: `linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 100%)`,
-            borderTop: `3px solid ${hoveredProject.accent}`,
+            borderTop: `3px solid ${displayedProject.accent}`,
           }}>
             {/* Accent glow blob */}
             <div style={{
               position: 'absolute', right: -20, top: -20,
               width: 120, height: 120, borderRadius: '50%',
-              background: hoveredProject.accent,
+              background: displayedProject.accent,
               opacity: 0.15,
               filter: 'blur(30px)',
             }} />
@@ -242,17 +264,17 @@ export default function WorkList() {
               <div>
                 <div style={{
                   fontSize: 9, letterSpacing: '2px',
-                  color: hoveredProject.accent, textTransform: 'uppercase',
+                  color: displayedProject.accent, textTransform: 'uppercase',
                   fontFamily: 'monospace', fontWeight: 700,
                 }}>
-                  {hoveredProject.tags[0]}
+                  {displayedProject.tags[0]}
                 </div>
                 <div style={{
                   fontSize: 15, fontWeight: 700, color: '#fff',
                   marginTop: 5, letterSpacing: '-0.02em', lineHeight: 1.2,
                   textTransform: 'uppercase',
                 }}>
-                  {hoveredProject.title}
+                  {displayedProject.title}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -260,15 +282,15 @@ export default function WorkList() {
                   fontSize: 10, color: 'rgba(255,255,255,0.35)',
                   letterSpacing: '1px', fontFamily: 'monospace',
                 }}>
-                  {hoveredProject.year}
+                  {displayedProject.year}
                 </span>
                 <div style={{
                   width: 28, height: 28, borderRadius: '50%',
-                  background: `${hoveredProject.accent}22`,
-                  border: `1px solid ${hoveredProject.accent}55`,
+                  background: `${displayedProject.accent}22`,
+                  border: `1px solid ${displayedProject.accent}55`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <span style={{ fontSize: 12, color: hoveredProject.accent }}>↗</span>
+                  <span style={{ fontSize: 12, color: displayedProject.accent }}>↗</span>
                 </div>
               </div>
             </div>
