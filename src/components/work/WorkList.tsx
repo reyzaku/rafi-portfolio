@@ -108,19 +108,13 @@ export default function WorkList() {
 
   return (
     <>
-      <div style={{
-        position: 'relative',
-        zIndex: 10,
-        paddingTop: 160,
-        paddingBottom: 160,
-        paddingLeft: H_PAD,
-        paddingRight: H_PAD,
-      }}>
+      {/* Outer wrapper — no horizontal padding so rows can go full width */}
+      <div style={{ position: 'relative', zIndex: 10, paddingTop: 160, paddingBottom: 160 }}>
 
         {/* ── Header ── */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          marginBottom: 20,
+          marginBottom: 20, paddingLeft: H_PAD, paddingRight: H_PAD,
         }}>
           <span style={{
             fontSize: 11, color: 'rgba(255,255,255,0.35)',
@@ -137,27 +131,24 @@ export default function WorkList() {
         </div>
 
         {/* ── Top divider ── */}
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.1)' }} />
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', marginLeft: H_PAD, marginRight: H_PAD }} />
 
         {/* ── Rows ── */}
         {PROJECTS.map((project, i) => {
           const isHovered = hoveredId === project.id
           return (
             <div key={project.id}>
+              {/* Row is full-width; content is padded internally */}
               <div
                 onMouseEnter={() => handleRowEnter(project)}
                 onMouseLeave={() => handleRowLeave()}
                 onClick={() => setActiveProject(project)}
                 style={{
                   display: 'flex', alignItems: 'flex-start', gap: 24,
-                  padding: '24px 0',
+                  paddingTop: 24, paddingBottom: 24,
+                  paddingLeft: H_PAD, paddingRight: H_PAD,
                   cursor: 'pointer',
                   background: isHovered ? '#fff' : 'transparent',
-                  // Bleed the white bg outside the container padding
-                  marginLeft:  isHovered ? `calc(-1 * ${H_PAD})` : 0,
-                  marginRight: isHovered ? `calc(-1 * ${H_PAD})` : 0,
-                  paddingLeft:  isHovered ? H_PAD : 0,
-                  paddingRight: isHovered ? H_PAD : 0,
                   transition: 'background 0.18s ease',
                 }}
               >
@@ -206,9 +197,9 @@ export default function WorkList() {
                 </span>
               </div>
 
-              {/* Row divider */}
+              {/* Row divider — stays within content margins */}
               <div style={{
-                height: 1,
+                height: 1, marginLeft: H_PAD, marginRight: H_PAD,
                 background: isHovered ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.08)',
                 transition: 'background 0.18s',
               }} />
