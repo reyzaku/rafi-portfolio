@@ -148,12 +148,20 @@ export default function WorkList() {
                     {project.title}
                   </div>
                   <div style={{
-                    fontSize: 11, letterSpacing: '1.5px',
-                    color: isHovered ? 'rgba(0,0,0,0.38)' : 'rgba(255,255,255,0.28)',
-                    marginTop: 9, textTransform: 'uppercase',
-                    transition: 'color 0.18s',
+                    display: 'flex', flexWrap: 'wrap', gap: 8,
+                    marginTop: 12,
                   }}>
-                    {project.tags.join(' · ')}
+                    {project.tags.map((tag) => (
+                      <span key={tag} style={{
+                        fontSize: 11, fontWeight: 600, letterSpacing: '0.5px',
+                        color: '#0B3D1E',
+                        background: '#5CFF85',
+                        padding: '4px 12px', borderRadius: 100,
+                        textTransform: 'uppercase', whiteSpace: 'nowrap',
+                      }}>
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
 

@@ -26,7 +26,7 @@ export default function WorkMobile() {
             style={{
               borderBottom: '1px solid rgba(255,255,255,0.08)',
               padding: '24px 0',
-              display: 'flex', alignItems: 'center', gap: 16,
+              display: 'flex', alignItems: 'flex-start', gap: 16,
               cursor: 'pointer',
             }}
           >
@@ -39,14 +39,28 @@ export default function WorkMobile() {
               {String(i + 1).padStart(2, '0')}
             </span>
 
-            <p style={{
-              flex: 1, fontSize: 17, fontWeight: 600,
-              letterSpacing: '-0.02em', color: '#fff',
-            }}>
-              {project.title}
-            </p>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{
+                fontSize: 17, fontWeight: 600,
+                letterSpacing: '-0.02em', color: '#fff',
+              }}>
+                {project.title}
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                {project.tags.map((tag) => (
+                  <span key={tag} style={{
+                    fontSize: 10, fontWeight: 600, letterSpacing: '0.5px',
+                    color: '#0B3D1E', background: '#5CFF85',
+                    padding: '3px 10px', borderRadius: 100,
+                    textTransform: 'uppercase', whiteSpace: 'nowrap',
+                  }}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', flexShrink: 0, alignSelf: 'flex-start' }}>
               {project.year}
             </span>
           </div>
