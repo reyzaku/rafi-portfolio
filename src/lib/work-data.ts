@@ -18,7 +18,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'gomobile',
     title: 'Gomobile Indonesia',
-    year: '2023–Now',
+    year: '2024–Now',
     tags: ['Digital Marketing', 'HTML5', 'Graphic Design'],
     accent: '#5CFF85',
     frames: [
@@ -44,7 +44,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'banner-ads',
     title: 'Banner Advertising Design',
-    year: '2024',
+    year: '2024–Now',
     tags: ['Static', 'Motion', 'HTML5'],
     accent: '#5CFF85',
     frames: [
@@ -57,7 +57,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'ui-gallery',
     title: 'UI Design Gallery',
-    year: '2025',
+    year: '2022–2025',
     tags: ['UI/UX', 'HTML+JS', 'UI Design'],
     accent: '#5CFF85',
     frames: [

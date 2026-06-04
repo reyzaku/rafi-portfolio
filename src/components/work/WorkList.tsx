@@ -87,12 +87,13 @@ export default function WorkList() {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           marginBottom: 20, paddingLeft: H_PAD, paddingRight: H_PAD,
         }}>
-          <span style={{
-            fontSize: 11, color: 'rgba(255,255,255,0.35)',
-            letterSpacing: '4px', fontFamily: 'monospace', textTransform: 'uppercase',
+          <h1 style={{
+            fontSize: 'clamp(40px, 6vw, 88px)', fontWeight: 800,
+            letterSpacing: '-0.04em', lineHeight: 1,
+            color: '#fff', margin: 0,
           }}>
-            /MY WORK
-          </span>
+            My Masterpiece
+          </h1>
           <span style={{
             fontSize: 11, color: 'rgba(255,255,255,0.2)',
             letterSpacing: '2.5px', fontFamily: 'monospace',
@@ -125,9 +126,10 @@ export default function WorkList() {
               >
                 {/* Index */}
                 <span style={{
-                  fontSize: 11, letterSpacing: '2px',
-                  color: isHovered ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.2)',
-                  fontFamily: 'monospace', minWidth: 28, paddingTop: 7,
+                  fontSize: 'clamp(24px, 2.6vw, 38px)', fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  color: isHovered ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.45)',
+                  fontFamily: 'monospace', minWidth: 56, paddingTop: 2,
                   flexShrink: 0,
                   transition: 'color 0.18s',
                 }}>

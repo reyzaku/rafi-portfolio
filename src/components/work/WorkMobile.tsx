@@ -12,9 +12,9 @@ export default function WorkMobile() {
           color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 12,
         }}>Selected Work</p>
         <h1 style={{
-          fontSize: 'clamp(40px, 10vw, 64px)', fontWeight: 700,
+          fontSize: 'clamp(40px, 10vw, 64px)', fontWeight: 800,
           letterSpacing: '-0.04em', color: '#fff', lineHeight: 1,
-        }}>My Work</h1>
+        }}>My Masterpiece</h1>
       </div>
 
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
@@ -33,8 +33,8 @@ export default function WorkMobile() {
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: project.accent, flexShrink: 0 }} />
 
             <span style={{
-              fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.25)',
-              letterSpacing: '2px', minWidth: 24,
+              fontSize: 22, fontWeight: 800, color: 'rgba(255,255,255,0.45)',
+              letterSpacing: '-0.02em', minWidth: 34, lineHeight: 1,
             }}>
               {String(i + 1).padStart(2, '0')}
             </span>
